@@ -47,7 +47,7 @@ class SenbayReader:
                 codes = zl.scan_codes('qrcode', image)
                 if len(codes) > 0:
                     # print(codes[0].decode('utf-8'))
-                    senbayDict = senbayData.getSenbayDataAsDect(str(codes[0].decode('utf-8')))
+                    senbayDict = senbayData.decode(str(codes[0].decode('utf-8')))
                     observer(self, senbayDict);
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break

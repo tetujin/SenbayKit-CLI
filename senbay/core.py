@@ -331,22 +331,22 @@ class SenbayData:
 
     def __init__(self, pn=122):
         self.PN = pn;
-        self.SF = SenbayFormat(122);
+        self.SF = SenbayFormat(pn);
         # print("init the SenbayData library");
 
-    def addNumber(self, key, value):
+    def add_number(self, key, value):
         #self.senbayData.update({key:value});
         if key is not None and value is not None:
             self.senbayData[key] = value;
 
-    def addText(self, key, value):
+    def add_text(self, key, value):
         if key is not None and value is not None:
             self.senbayData[key] = "'"+value+"'";
 
     def clear(self):
         self.senbayData = {};
 
-    def getSenbayFormattedData(self,compress=False):
+    def encode(self, compress=False):
         formattedData = "";
         count = 0;
         for k,v in self.senbayData.items():
@@ -360,7 +360,7 @@ class SenbayData:
         else:
             return "V:3,"+formattedData;
 
-    def getSenbayDataAsDect(self,text):
+    def decode(self,text):
         senbayDict = {};
         elements = text.split(",");
         isCompress = False

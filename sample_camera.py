@@ -46,10 +46,10 @@ if __name__ == '__main__':
             threads = int(args[i+1])
 
     def process():
-        sd = SenbayData(122);
+        sd = SenbayData();
         now = time.time()
-        sd.addNumber("TIME",now)
-        data = sd.getSenbayFormattedData(False);
+        sd.add_number("TIME",now)
+        data = sd.encode();
         return data;
 
     def completion():

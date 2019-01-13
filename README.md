@@ -10,7 +10,7 @@
 
 ライブラリの開発はmacOS 10.12 (Sierra)で行なったが、他のUNIX系OSでも動作する。
 
-### pip を使った依存ライブラリのインストール
+### 依存ライブラリのインストール
 ```command
 pip install numpy
 pip install opencv-python
@@ -18,10 +18,15 @@ pip install fastzbarlight
 pip install qrcode
 ```
 
-### setup.py を使った **SenbayKit** のインストール
+### **SenbayKit** のインストール
 SenbayKit-CLIのホームディレクトリに移動し、以下のコマンドを実行する。`senbay`パッケージがインストールされる。
 ```command
 python setup.py install
+```
+
+または、`pip`を使ってGitHubから直接インストールする。
+```command
+pip install git+https://github.com/tetujin/SenbayKit-CLI
 ```
 
 ## 使用方法
@@ -30,7 +35,7 @@ python setup.py install
 
 コマンドラインからの起動は以下のコマンドで実行できる。
 ```command
-$ ./sample_camera.py
+./sample_camera.py
 ```
 
 オプションは以下の通り指定できる。
@@ -80,7 +85,7 @@ camera.start(generateContent,complete)
 第一引数にSenbay Videoのパスをしていることで、ビデオを再生しながら、QRコード内に保存されているセンサデータをリアルタイムに取得できる。
 
 ```command
-$ ./sample_reader.py video_path
+./sample_reader.py video_path
 ```
 
 Pythonコード内で利用する場合には、`senbay`パッケージから`SenbayReader`モジュールをインポートし、`SenbayReader`の初期化する。初期化時に、Senbay Videoのパスを指定する。`start`関数実行時に、コールバック関数を与えることで、SenbayReaderが検出したデータをその都度受け取ることができる。
@@ -108,10 +113,9 @@ SenbayFormatデータの生成
 from senbay import SenbayData
 
 sd = SenbayData()
-sd.addNumber('key',value);
-sd.addText('key','value');
-sampleData = sd.getSenbayFormattedData(False); # or True (= with Base-122 Data Compression)
-print(sampleData);
+sd.add_number('key',value);
+sd.add_text('key','value');
+print(sd.encode());
 
 ```
 
@@ -121,8 +125,8 @@ SenbayFormatデータの解析
 from senbay import SenbayData
 sd = SenbayData()
 senbayFormatText = 'V:3,TIME:123456,ACCX:1234,ACCY:56789';
-dictData = sd.getSenbayDataAsDect(senbayFormatText);
-print(dictData)
+dict = sd.decode(senbayFormatText);
+print(dict)
 ```
 
 
