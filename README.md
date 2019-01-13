@@ -11,7 +11,7 @@
 ライブラリの開発はmacOS 10.12 (Sierra)で行なったが、他のUNIX系OSでも動作する。
 
 ### pip を使った依存ライブラリのインストール
-```
+```command
 pip install numpy
 pip install opencv-python
 pip install fastzbarlight
@@ -20,7 +20,7 @@ pip install qrcode
 
 ### setup.py を使った **SenbayKit** のインストール
 SenbayKit-CLIのホームディレクトリに移動し、以下のコマンドを実行する。`senbay`パッケージがインストールされる。
-```
+```command
 python setup.py install
 ```
 
@@ -29,19 +29,20 @@ python setup.py install
 **SenbaCamera** は、(1)カメラモジュールから映像を読み込み、(2)各フレームにセンサデータ（=SenbayFormat）が保存されたQRコードを埋め込み、(3)動画ファイル（Senbay Video）として出力するアプリケーションである。
 
 コマンドラインからの起動は以下のコマンドで実行できる。
-```
+```command
 $ ./sample_camera.py
 ```
 
 オプションは以下の通り指定できる。
 
-|短縮オプションキー|オプションキー|デフォルト値|
-|-w| --width        |640 |
-|-h| --height       |360 |
-|-o| --video-output |'senbay_video_output.m4v' |
-|-i| --camera-input |0  |
-|-f| --fps          |30 |
-|-t| --threads      |10 |
+| オプション | デフォルト値 |
+| ---- | ---- |
+| -w --width        | 640 |
+| -h --height       | 360 |
+| -o --video-output | 'senbay_video_output.m4v' |
+| -i --camera-input | 0  |
+| -f --fps          | 30 |
+| -t --threads      | 10 |
 
 pythonコード内で利用する場合には、まず`senbay`パッケージから`SenbayCamera`モジュールをインポートし初期化する。起動時にコードバック関数を与えることで、QRコードの生成と、終了イベントをハンドルできる。
 
@@ -78,7 +79,7 @@ camera.start(generateContent,complete)
 以下のコードでコマンドラインからSenbay Readerを起動できる。
 第一引数にSenbay Videoのパスをしていることで、ビデオを再生しながら、QRコード内に保存されているセンサデータをリアルタイムに取得できる。
 
-```
+```command
 $ ./sample_reader.py video_path
 ```
 
@@ -103,7 +104,7 @@ reader.start(showResult)
 
 ### SenbayFormat
 SenbayFormatデータの生成
-```
+```python
 from senbay import SenbayData
 
 sd = SenbayData()
@@ -116,7 +117,7 @@ print(sampleData);
 
 ### SenbayFormat
 SenbayFormatデータの解析
-```
+```python
 from senbay import SenbayData
 sd = SenbayData()
 senbayFormatText = 'V:3,TIME:123456,ACCX:1234,ACCY:56789';
