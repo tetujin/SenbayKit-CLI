@@ -1,14 +1,14 @@
 # 概要
-**SenbayKit-CLI** は、**SenbayVideo** の生成と解析をコマンドライン、またはPythonプログラム内から利用するためのライブラリである。SenbayVideoとは、動画の各フレームにセンサデータ（QRコード）が埋め込まれた動画のことであり、動画と共に容易にセンサデータの記録と配信を可能にする。
+**SenbayKit-CLI** は、**SenbayVideo** の生成と解析をコマンドライン、またはPythonプログラム内から利用するためのライブラリです。SenbayVideoとは、動画の各フレームにセンサデータ（QRコード）が埋め込まれた動画のことであり、動画と共に容易にセンサデータの記録と配信を可能にします。
 
 ## 開発環境
-本ライブラリは、Python3をベースに構築されており、以下の外部ライブラリに依存している。
+本ライブラリは、Python3をベースに構築されており、以下の外部ライブラリに依存しています。
  * NumPy
  * OpenCV 3
  * fastzbarlight
  * qrcode
 
-ライブラリの開発はmacOS 10.12 (Sierra)で行なったが、他のUNIX系OSでも動作する。
+ライブラリの開発はmacOS 10.12 (Sierra)で行なったが、他のUNIX系OSでも動作します。
 
 ### 依存ライブラリのインストール
 ```command
@@ -19,26 +19,26 @@ pip install qrcode
 ```
 
 ### **SenbayKit** のインストール
-SenbayKit-CLIのホームディレクトリに移動し、以下のコマンドを実行する。`senbay`パッケージがインストールされる。
+SenbayKit-CLIのホームディレクトリに移動し、以下のコマンドを実行すると、`senbay`パッケージがインストールされます。
 ```command
 python setup.py install
 ```
 
-または、`pip`を使ってGitHubから直接インストールする。
+または、`pip`を使ってGitHubから直接インストールすることもできます。
 ```command
 pip install git+https://github.com/tetujin/SenbayKit-CLI
 ```
 
 ## 使用方法
 ### SenbayCamera
-**SenbaCamera** は、(1)カメラモジュールから映像を読み込み、(2)各フレームにセンサデータ（=SenbayFormat）が保存されたQRコードを埋め込み、(3)動画ファイル（Senbay Video）として出力するアプリケーションである。
+**SenbaCamera** は、(1)カメラモジュールから映像を読み込み、(2)各フレームにセンサデータ（=SenbayFormat）が保存されたQRコードを埋め込み、(3)動画ファイル（Senbay Video）として出力するアプリケーションです。
 
-コマンドラインからの起動は以下のコマンドで実行できる。
+ダウンロードしたSenbayKit-CLIのホームディレクトリに移動し、以下のコマンドで実行できます。
 ```command
 ./sample_camera.py
 ```
 
-オプションは以下の通り指定できる。
+また、動画のサイズや、出力先、フレームレートなどは、以下のオプションを使って指定できます。
 
 | オプション | デフォルト値 |
 | ---- | ---- |
@@ -49,7 +49,7 @@ pip install git+https://github.com/tetujin/SenbayKit-CLI
 | -f --fps          | 30 |
 | -t --threads      | 10 |
 
-pythonコード内で利用する場合には、まず`senbay`パッケージから`SenbayCamera`モジュールをインポートし初期化する。起動時にコードバック関数を与えることで、QRコードの生成と、終了イベントをハンドルできる。
+pythonコード内で利用する場合には、まず`senbay`パッケージから`SenbayCamera`モジュールをインポートし、初期化します。起動時にコードバック関数を与えることで、QRコードの生成と、終了イベントをハンドルできます。
 
 ```python
 from senbay import SenbayCamera
@@ -79,10 +79,9 @@ camera.start(get_content,complete)
 - [ ] 他プラットフォームでのテスト（Raspberry Piなど）
 
 ### SenbayReader
-**Senbay Reader** は、Senbay Video内に埋め込まれたQRコードから、センサデータを取り出すアプリケーションである。
+**Senbay Reader** は、Senbay Video内に埋め込まれたQRコードから、センサデータを取り出すアプリケーションです。
 
-以下のコードでコマンドラインからSenbay Readerを起動できる。
-第一引数にSenbay Videoのパスをしていることで、ビデオを再生しながら、QRコード内に保存されているセンサデータをリアルタイムに取得できる。
+ダウンロードしたSenbayKit-CLIのホームディレクトリに移動し、以下のコマンドでSenbay Readerを起動する。第一引数にSenbay Videoへのパスを指定することで、ビデオを再生しながら、QRコード内に保存されているセンサデータをリアルタイムに取得できる。
 
 ```command
 ./sample_reader.py video_path
@@ -116,7 +115,6 @@ sd = SenbayData()
 sd.add_number('key',value);
 sd.add_text('key','value');
 print(sd.encode());
-
 ```
 
 ### SenbayFormat
