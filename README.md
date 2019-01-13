@@ -10,7 +10,7 @@
 開発はmacOS 10.12 (Sierra)で行いましたが、UNIX系OSでも動作します。
 
 ### pip を使った依存ライブラリのインストール
-```
+```command
 pip install numpy
 pip install opencv-python
 pip install fastzbarlight
@@ -19,7 +19,7 @@ pip install qrcode
 
 ### setup.py を使った **SenbayKit** のインストール
 SenbayKit-CLIのホームディレクトリに移動し、以下のコマンドを実行する。`senbay`パッケージがインストールされる。
-```
+```command
 python setup.py install
 ```
 
@@ -28,18 +28,20 @@ python setup.py install
 **SenbaCamera** は、カメラモジュールから映像を読み込み、センサデータ（=SenbayFormat）が保存されたQRコードを各フレームに埋め込み、動画ファイル（Senbay Video）として出力するアプリケーションです。
 
 コマンドラインからの起動は以下のコマンドで実行できる。
-```
+```command
 $ ./sample_camera.py
 ```
 
 オプションは以下の通り指定できる。
-|短縮オプションキー|オプションキー|デフォルト値|
-|-w| --width        |640 |
-|-h| --height       |360 |
-|-o| --video-output |'senbay_video_output.m4v' |
-|-i| --camera-input |0  |
-|-f| --fps          |30 |
-|-t| --threads      |10 |
+
+| オプション | デフォルト値 |
+| ---- | ---- |
+| -w --width        | 640 |
+| -h --height       | 360 |
+| -o --video-output | 'senbay_video_output.m4v' |
+| -i --camera-input | 0  |
+| -f --fps          | 30 |
+| -t --threads      | 10 |
 
 pythonコード内で利用する場合には、`SenbayCamera` モジュールをインポートし、カメラを起動する。起動時にコードバック関数を与えることで、QRコードの生成と、終了イベントをハンドルできる。
 
@@ -76,7 +78,7 @@ Senbay Readerは、Senbay Video内に埋め込まれたQRコードから、セ�
 以下のコードでコマンドラインからSenbay Readerを起動できる。
 第一引数にSenbay Videoのパスをしていることで、ビデオを再生しながら、QRコード内に保存されているセンサデータをリアルタイムに取得できる。
 
-```
+```command
 $ ./sample_reader.py video_path
 ```
 
@@ -101,10 +103,10 @@ reader.start(showResult)
 
 ### SenbayFormat
 SenbayFormatデータの生成
-```
-import SenbayData as SD
+```python
+from senbay import SenbayData
 
-sd = SD.SenbayData()
+sd = SenbayData()
 sd.addNumber('key',value);
 sd.addText('key','value');
 sampleData = sd.getSenbayFormattedData(False); # or True (= with Base-122 Data Compression)
@@ -114,9 +116,9 @@ print(sampleData);
 
 ### SenbayFormat
 SenbayFormatデータの解析
-```
-import SenbayData as SD
-sd = SD.SenbayData()
+```python
+from senbay import SenbayData
+sd = SenbayData()
 senbayFormatText = 'V:3,TIME:123456,ACCX:1234,ACCY:56789';
 dictData = sd.getSenbayDataAsDect(senbayFormatText);
 print(dictData)
