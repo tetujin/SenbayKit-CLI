@@ -1,13 +1,14 @@
 # 概要
-**SenbayKit-CLI** は、**SenbayVideo** の生成と解析をコマンドライン、またPythonプログラム内から利用するためのライブラリです。SenbayVideoとは、動画の各フレームにセンサデータ（QRコード）が埋め込まれた動画のことであり、動画と共に容易にセンサデータの記録と配信を可能にします。
+**SenbayKit-CLI** は、**SenbayVideo** の生成と解析をコマンドライン、またはPythonプログラム内から利用するためのライブラリである。SenbayVideoとは、動画の各フレームにセンサデータ（QRコード）が埋め込まれた動画のことであり、動画と共に容易にセンサデータの記録と配信を可能にする。
 
 ## 開発環境
-本ライブラリは、Python3をベースに構築されています。また、本ライブラリは以下の外部ライブラリに依存しています。
+本ライブラリは、Python3をベースに構築されており、以下の外部ライブラリに依存している。
  * NumPy
  * OpenCV 3
  * fastzbarlight
  * qrcode
-開発はmacOS 10.12 (Sierra)で行いましたが、UNIX系OSでも動作します。
+
+ライブラリの開発はmacOS 10.12 (Sierra)で行なったが、他のUNIX系OSでも動作する。
 
 ### pip を使った依存ライブラリのインストール
 ```
@@ -25,7 +26,7 @@ python setup.py install
 
 ## 使用方法
 ### SenbayCamera
-**SenbaCamera** は、カメラモジュールから映像を読み込み、センサデータ（=SenbayFormat）が保存されたQRコードを各フレームに埋め込み、動画ファイル（Senbay Video）として出力するアプリケーションです。
+**SenbaCamera** は、(1)カメラモジュールから映像を読み込み、(2)各フレームにセンサデータ（=SenbayFormat）が保存されたQRコードを埋め込み、(3)動画ファイル（Senbay Video）として出力するアプリケーションである。
 
 コマンドラインからの起動は以下のコマンドで実行できる。
 ```
@@ -33,6 +34,7 @@ $ ./sample_camera.py
 ```
 
 オプションは以下の通り指定できる。
+
 |短縮オプションキー|オプションキー|デフォルト値|
 |-w| --width        |640 |
 |-h| --height       |360 |
@@ -41,7 +43,7 @@ $ ./sample_camera.py
 |-f| --fps          |30 |
 |-t| --threads      |10 |
 
-pythonコード内で利用する場合には、`SenbayCamera` モジュールをインポートし、カメラを起動する。起動時にコードバック関数を与えることで、QRコードの生成と、終了イベントをハンドルできる。
+pythonコード内で利用する場合には、まず`senbay`パッケージから`SenbayCamera`モジュールをインポートし初期化する。起動時にコードバック関数を与えることで、QRコードの生成と、終了イベントをハンドルできる。
 
 ```python
 from senbay import SenbayCamera
@@ -57,21 +59,21 @@ camera.start(generateContent,complete)
 ```
 
 #### NOTE
-* CPU+シングルスレッドでは、10FPSが限界。タイムラプス風の動画になってしまう。
-* パフォーマンス向上の為にマルチスレッド化を行い、「映像撮影」と「映像合成+動画ファイルへの書き込み」部分は切り分けた。時々順番が入れ替わったりと、少し不安定な部分がある。スレッド数の上限（デフォルトでは10個まで）を決めないと、スレッドは無限に増え続け、300を超えたところでクラッシュする。
+* CPU+シングルスレッドでは、10FPSが限界。
+* パフォーマンス向上の為にマルチスレッド化を行い、「映像撮影」と「映像合成+動画ファイルへの書き込み」部分は切り分けたが、少し不安定（フレームの時々順番が入れ替わる）。スレッド数の上限（デフォルトでは10）を設定しないと、スレッドは無限に増え続け、300を超えたところでクラッシュする。
 * macOS Mojave では、QRコード合成済みの動画を出力しようとするとクラッシュする。どうやら画面に画像表示する場合は、メインスレッドで `cv2.imshow` を実行する必要がある。一時的に、カメラインプットをそのまま表示している。
 * スレッド管理は、順番が保証される `queue` が適切。今後修正予定。
 
 #### TODO
 - [x] マルチスレッド化
-- [x] 各種設定をoptionで指定
+- [x] 各種設定をオプションで指定
 - [ ] Queueの利用
 - [ ] GPUの利用
 - [ ] UIの修正
 - [ ] 他プラットフォームでのテスト（Raspberry Piなど）
 
 ### SenbayReader
-Senbay Readerは、Senbay Video内に埋め込まれたQRコードから、センサデータを取り出すアプリケーションです。
+**Senbay Reader** は、Senbay Video内に埋め込まれたQRコードから、センサデータを取り出すアプリケーションである。
 
 以下のコードでコマンドラインからSenbay Readerを起動できる。
 第一引数にSenbay Videoのパスをしていることで、ビデオを再生しながら、QRコード内に保存されているセンサデータをリアルタイムに取得できる。
@@ -80,7 +82,7 @@ Senbay Readerは、Senbay Video内に埋め込まれたQRコードから、セ�
 $ ./sample_reader.py video_path
 ```
 
-Pythonコード内で利用する場合には、`SenbayReader`モジュールをインポートし、`SenbayReader`の初期化時に、Senbay Videoのパスをしてする。`start`関数実行時に、コールバック関数を与えることで、SenbayReaderが検出したデータをその都度取得できる。
+Pythonコード内で利用する場合には、`senbay`パッケージから`SenbayReader`モジュールをインポートし、`SenbayReader`の初期化する。初期化時に、Senbay Videoのパスを指定する。`start`関数実行時に、コールバック関数を与えることで、SenbayReaderが検出したデータをその都度受け取ることができる。
 
 ```python
 from senbay import SenbayReader
@@ -94,7 +96,7 @@ reader.start(showResult)
 
 #### TODO
  - [ ] マルチスレッド化
- - [x] 各種設定をoptionで指定
+ - [x] 各種設定をオプションで指定
  - [ ] GPUの利用
  - [ ] UIの修理
  - [ ] 他プラットフォームでのテスト（Raspberry Piなど）
@@ -102,9 +104,9 @@ reader.start(showResult)
 ### SenbayFormat
 SenbayFormatデータの生成
 ```
-import SenbayData as SD
+from senbay import SenbayData
 
-sd = SD.SenbayData()
+sd = SenbayData()
 sd.addNumber('key',value);
 sd.addText('key','value');
 sampleData = sd.getSenbayFormattedData(False); # or True (= with Base-122 Data Compression)
@@ -115,8 +117,8 @@ print(sampleData);
 ### SenbayFormat
 SenbayFormatデータの解析
 ```
-import SenbayData as SD
-sd = SD.SenbayData()
+from senbay import SenbayData
+sd = SenbayData()
 senbayFormatText = 'V:3,TIME:123456,ACCX:1234,ACCY:56789';
 dictData = sd.getSenbayDataAsDect(senbayFormatText);
 print(dictData)
@@ -124,8 +126,7 @@ print(dictData)
 
 
 ## Author and Contributors
-
-SenbayKit-CLI is authord by [Yuuki Nishiyama](http://www.yuukinishiyama.com). In addition, [Takuro Yonezawa](https://www.ht.sfc.keio.ac.jp/~takuro/), [Denzil Ferreira](http://www.oulu.fi/university/researcher/denzil-ferreira), [Anind K. Dey](http://www.cs.cmu.edu/~anind/), [Jin Nakazawa](https://keio.pure.elsevier.com/ja/persons/jin-nakazawa) are deeply contributing this project. Please see more detail information on our [website](http://www.senbay.info).
+**SenbayKit-CLI** is authord by [Yuuki Nishiyama](http://www.yuukinishiyama.com). In addition, [Takuro Yonezawa](https://www.ht.sfc.keio.ac.jp/~takuro/), [Denzil Ferreira](http://www.oulu.fi/university/researcher/denzil-ferreira), [Anind K. Dey](http://www.cs.cmu.edu/~anind/), [Jin Nakazawa](https://keio.pure.elsevier.com/ja/persons/jin-nakazawa) are deeply contributing this project. Please see more detail information on our [website](http://www.senbay.info).
 
 ## Related Links
 * [Senbay Platform Website](http://www.senbay.info)
