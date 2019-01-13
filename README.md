@@ -54,14 +54,14 @@ pythonコード内で利用する場合には、まず`senbay`パッケージか
 ```python
 from senbay import SenbayCamera
 
-def generateContent:
+def get_content():
   return "generate and return a QRcode content"
 
 def complete():
   print("done")
 
 camera = SenbayCamera()
-camera.start(generateContent,complete)
+camera.start(get_content,complete)
 ```
 
 #### NOTE
