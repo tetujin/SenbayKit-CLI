@@ -152,7 +152,7 @@ class SenbayCamera:
         while(camera_in.isOpened()):
             '''
             def delegatedMethod(self):
-                sd = SenbayData.SenbayData(122);
+                sd = SenbayData.SenbayData(121);
                 now = time.time()
                 sd.addNumber("TIME",now)
                 data = sd.getSenbayFormattedData(True);

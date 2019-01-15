@@ -68,7 +68,7 @@ class BaseX:
                        114,  115,  116,  117,  118,
                        119,  120,  121];
 
-    def __init__(self, positionalNotation=122):
+    def __init__(self, positionalNotation=121):
         """
         @param: Positional notation
         """
@@ -227,10 +227,10 @@ class SenbayFormat:
                       "PITC":"9","HEAD":"A","SPEE":"B",
                       "BRIG":"C","AIRP":"D","HTBT":"E"};
 
-    PN = 122;
+    PN = 121;
     basex = None;
 
-    def __init__(self, positionalNotation=122):
+    def __init__(self, positionalNotation=121):
         self.PN = positionalNotation;
         self.basex = BaseX(self.PN);
 
@@ -326,10 +326,10 @@ class SenbayFormat:
 
 class SenbayData:
     senbayData = {};
-    PN = 122;
+    PN = 121;
     SF = SenbayFormat();
 
-    def __init__(self, pn=122):
+    def __init__(self, pn=121):
         self.PN = pn;
         self.SF = SenbayFormat(pn);
         # print("init the SenbayData library");
