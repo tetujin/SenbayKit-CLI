@@ -15,7 +15,6 @@ import cv2
 import fastzbarlight as zl
 from PIL import Image
 from mss import mss
-from PIL import ImageGrab
 
 # import core as sd
 from senbay import SenbayData
