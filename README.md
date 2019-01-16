@@ -42,14 +42,14 @@ pip install git+https://github.com/tetujin/SenbayKit-CLI
 ### SenbayReader
 **SenbayReader** is a module for decoding embedded sensor data from SenbayVideo.
 
-#### Decoding on CLI
+#### On CLI
 Move to SenbayKit-CLI directory, and execute the following command with a path of a SenbayVideo.
 
 ```command
 ./sample_reader.py video_path
 ```
 
-#### Decoding in Python
+#### In Python
 For using the package in Python, You need to import `SenbayReader` module from `senbay` package. `SenbayReader` has three types of mode: video, camera, and screen. You can select mode for selecting the image input source at the `SenbayReader` initialization phase. The result is provided through a callback method which is set by you when executing `start` method.
 
 On *Video Mode*, you can decode embedded data from a target SenbayVideo. The mode needs to set `mode='video'`(or `mode=0`) and `video_in='target_senbay_video'` when you initialize `SenbayReader`.
@@ -100,6 +100,7 @@ reader.start(showResult)
 ### SenbayCamera
 **SenbaCamera** allows us to embed sensor data as QRcode into each image frame which is input from a camera module on your computer, and export a SenbayVideo.
 
+#### On CLI
 Download SenbayKit-CLI from GitHub and move to the directory. You can execute SenbayCamera by the following command.
  ```command
  ./sample_camera.py
@@ -116,6 +117,8 @@ Options to change video size, frame rate, and output path are as following.
  | -f --fps          | 30 |
  | -t --threads      | 10 |
 
+
+#### In Python
 For using the package in Python, You need to import `SenbayCamera` module from `senbay` package. You can handle "QRcode generation" and "completion" events by through callback methods which are set by you when executing `start` method.
 In the "QRcode generation" method, you need to return a String object as a content of a QRcode. Inside SenbayCamera, a QRcode based on the returned String object is generated and embedded into a video frame automatically.
 
@@ -174,7 +177,7 @@ print(dict)
 Please cite these papers in your publications if it helps your research:
 
 ```
-@inproceedings{Nishiyama:2018:SPI:3236112.3236154,
+@inproceedings{Nishiyama-Senbay-MobileHCI18,
   author = {Nishiyama, Yuuki and Dey, Anind K. and Ferreira, Denzil and Yonezawa, Takuro and Nakazawa, Jin},
   title = {Senbay: A Platform for Instantly Capturing, Integrating, and Restreaming of Synchronized Multiple Sensor-data Stream},
   booktitle = {Proceedings of the 20th International Conference on Human-Computer Interaction with Mobile Devices and Services Adjunct},
