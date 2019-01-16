@@ -106,14 +106,15 @@ Download SenbayKit-CLI from GitHub and move to the directory. You can execute Se
  ```
 
 Options to change video size, frame rate, and output path are as following.
-| Option | Default Value |
-| ---- | ---- |
-| -w --width        | 640 |
-| -h --height       | 360 |
-| -o --video-output | 'senbay_video_output.m4v' |
-| -i --camera-input | 0  |
-| -f --fps          | 30 |
-| -t --threads      | 10 |
+
+ | Option | Default Value |
+ | ---- | ---- |
+ | -w --width        | 640 |
+ | -h --height       | 360 |
+ | -o --video-output | 'senbay_video_output.m4v' |
+ | -i --camera-input | 0  |
+ | -f --fps          | 30 |
+ | -t --threads      | 10 |
 
 For using the package in Python, You need to import `SenbayCamera` module from `senbay` package. You can handle "QRcode generation" and "completion" events by through callback methods which are set by you when executing `start` method.
 In the "QRcode generation" method, you need to return a String object as a content of a QRcode. Inside SenbayCamera, a QRcode based on the returned String object is generated and embedded into a video frame automatically.
