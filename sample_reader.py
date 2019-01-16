@@ -11,21 +11,22 @@ from senbay import SenbayReader
 
 if __name__ == '__main__':
 
-	'''
-	$ ./sample_reader.py ./media/video/sample.m4v
-	'''
+    if len(sys.argv[1:]) < 4:
+        print('-----------------------------')
+        print('[Error]   Please set a capture area as arguments')
+        print('[Example] $ ./sample_reader.py 100 100 200 200')
+        print('------------------------------')
+    else:
+        top    = sys.argv[1]
+        left   = sys.argv[2]
+        width  = sys.argv[3]
+        height = sys.argv[4]
+        print("top:"+top+", left:"+left+", width:"+width+", height:"+height)
 
-	if len(sys.argv[1:]) < 1:
-		print('-----------------------------------------------------')
-		print('[Error]   Please set a video file path as an argument')
-		print('[Example] $ ./sample_reader.py ./media/video/sample.m4v')
-		print('-----------------------------------------------------')
-	else:
-		video_path = sys.argv[1];
-		print(video_path)
+        cap_area = {'top':int(top), 'left':int(left), 'width':int(width), 'height':int(height)}
 
-		def showResult(self, data):
-			print(data)
+        def showResult(self, data):
+            print(data)
 
-		reader = SenbayReader(video_path)
-		reader.start(showResult)
+        reader = SenbayReader(mode='screen', cap_area=cap_area)
+        reader.start(showResult)

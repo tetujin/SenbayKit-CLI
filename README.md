@@ -7,6 +7,7 @@
  * OpenCV 3
  * fastzbarlight
  * qrcode
+ * mss
 
 ライブラリの開発はmacOS 10.12 (Sierra)で行なったが、他のUNIX系OSでも動作します。
 
@@ -16,6 +17,7 @@ pip install numpy
 pip install opencv-python
 pip install fastzbarlight
 pip install qrcode
+pip install mss
 ```
 
 ### **SenbayKit** のインストール
@@ -87,15 +89,44 @@ camera.start(get_content,complete)
 ./sample_reader.py video_path
 ```
 
-Pythonコード内で利用する場合には、`senbay`パッケージから`SenbayReader`モジュールをインポートし、`SenbayReader`の初期化する。初期化時に、Senbay Videoのパスを指定する。`start`関数実行時に、コールバック関数を与えることで、SenbayReaderが検出したデータをその都度受け取ることができる。
+Pythonコード内で利用する場合には、`senbay`パッケージから`SenbayReader`モジュールをインポートし、`SenbayReader`の初期化する。SenbayReaderは、ビデオ(0)・カメラ(1)・スクリーン(2)の三通りの画像の取得先を選択できる。`start`関数実行時に、コールバック関数を与えることで、SenbayReaderが検出したデータをその都度受け取ることができる。
+
+ビデオモードでは、指定したSenbay動画からQRコードを検出できる。ビデオの場合は、SenbayReaderモードを`mode=0`または`mode='video'`にし、ローカルのSenbay動画からパスを与える。
 
 ```python
+# ビデオモード
 from senbay import SenbayReader
 
 def showResult(self, data):
   print(data)
 
-reader = SenbayReader(video_path)
+reader = SenbayReader(mode=0, video_in='path_to_senbay_video')
+reader.start(showResult)
+```
+
+カメラ・スクリーンモードでは、カメラまたはスクリーン上からQRコードを検出できる。SenbayReaderモードを、カメラの場合は`mode=1`または`mode='camera'`、スクリーンの場合には、`mode=2`または`mode='screen'`に設定する。スクリーンモードでは加えて、キャプチャ領域の指定が必要です。
+
+```python
+# カメラモード
+from senbay import SenbayReader
+
+def showResult(self, data):
+    print(data)
+
+reader = SenbayReader(mode='camera')
+reader.start(showResult)
+```
+
+```python
+# スクリーンモード
+from senbay import SenbayReader
+
+cap_area = {'top':200, 'left':200, 'width':200, 'height':200}
+
+def showResult(self, data):
+    print(data)
+
+reader = SenbayReader(mode='screen', cap_area=cap_area)
 reader.start(showResult)
 ```
 
