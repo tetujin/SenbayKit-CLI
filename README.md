@@ -55,7 +55,7 @@ For using the package in Python, You need to import `SenbayReader` module from `
 On *Video Mode*, you can decode embedded data from a target SenbayVideo. The mode needs to set `mode='video'`(or `mode=0`) and `video_in='target_senbay_video'` when you initialize `SenbayReader`.
 
 ```python
-# Vide Mode
+# Video Mode
 from senbay import SenbayReader
 
 def showResult(self, data):
@@ -177,7 +177,7 @@ print(dict)
 Please cite these papers in your publications if it helps your research:
 
 ```
-@inproceedings{Nishiyama-Senbay-MobileHCI18,
+@inproceedings{Nishiyama:2018:SPI:3236112.3236154,
   author = {Nishiyama, Yuuki and Dey, Anind K. and Ferreira, Denzil and Yonezawa, Takuro and Nakazawa, Jin},
   title = {Senbay: A Platform for Instantly Capturing, Integrating, and Restreaming of Synchronized Multiple Sensor-data Stream},
   booktitle = {Proceedings of the 20th International Conference on Human-Computer Interaction with Mobile Devices and Services Adjunct},
