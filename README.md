@@ -1,6 +1,11 @@
 # 概要
 **SenbayKit-CLI** は、**SenbayVideo** の生成と解析をコマンドライン、またはPythonプログラム内から利用するためのライブラリです。SenbayVideoとは、動画の各フレームにセンサデータ（QRコード）が埋め込まれた動画のことであり、動画と共に容易にセンサデータの記録と配信を可能にします。
 
+
+<p align="center">
+    <img src="media/image/senbay_reader_demo.gif", width="640">
+</p>
+
 ## 開発環境
 本ライブラリは、Python3をベースに構築されており、以下の外部ライブラリに依存しています。
  * NumPy
@@ -91,7 +96,7 @@ camera.start(get_content,complete)
 
 Pythonコード内で利用する場合には、`senbay`パッケージから`SenbayReader`モジュールをインポートし、`SenbayReader`の初期化する。SenbayReaderは、ビデオ(0)・カメラ(1)・スクリーン(2)の三通りの画像の取得先を選択できる。`start`関数実行時に、コールバック関数を与えることで、SenbayReaderが検出したデータをその都度受け取ることができる。
 
-ビデオモードでは、指定したSenbay動画からQRコードを検出できる。ビデオの場合は、SenbayReaderモードを`mode=0`または`mode='video'`にし、ローカルのSenbay動画からパスを与える。
+ビデオモードでは、指定したSenbay動画からQRコードを検出できる。ビデオの場合は、SenbayReaderモードを`mode='video'`（または`mode=0`）にし、ローカルのSenbay動画からパスを与える。
 
 ```python
 # ビデオモード
@@ -100,11 +105,11 @@ from senbay import SenbayReader
 def showResult(self, data):
   print(data)
 
-reader = SenbayReader(mode=0, video_in='path_to_senbay_video')
+reader = SenbayReader(mode='video', video_in='path_to_senbay_video')
 reader.start(showResult)
 ```
 
-カメラ・スクリーンモードでは、カメラまたはスクリーン上からQRコードを検出できる。SenbayReaderモードを、カメラの場合は`mode=1`または`mode='camera'`、スクリーンの場合には、`mode=2`または`mode='screen'`に設定する。スクリーンモードでは加えて、キャプチャ領域の指定が必要です。
+カメラ・スクリーンモードでは、カメラまたはスクリーン上からQRコードを検出できる。SenbayReaderモードを、カメラの場合は`mode='camera'`（または`mode=1`）、スクリーンの場合には、`mode='screen'`（または`mode=2`）に設定する。スクリーンモードでは加えて、キャプチャ領域の指定が必要です。
 
 ```python
 # カメラモード
