@@ -42,14 +42,14 @@ pip install git+https://github.com/tetujin/SenbayKit-CLI
 ### SenbayReader
 **SenbayReader** is a module for decoding embedded sensor data from SenbayVideo.
 
-#### On CLI
+#### CLI
 Move to SenbayKit-CLI directory, and execute the following command with a path of a SenbayVideo.
 
 ```command
 ./sample_reader.py video_path
 ```
 
-#### In Python
+#### Python
 For using the package in Python, You need to import `SenbayReader` module from `senbay` package. `SenbayReader` has three types of mode: video, camera, and screen. You can select mode for selecting the image input source at the `SenbayReader` initialization phase. The result is provided through a callback method which is set by you when executing `start` method.
 
 On *Video Mode*, you can decode embedded data from a target SenbayVideo. The mode needs to set `mode='video'`(or `mode=0`) and `video_in='target_senbay_video'` when you initialize `SenbayReader`.
@@ -100,10 +100,10 @@ reader.start(showResult)
 ### SenbayCamera
 **SenbaCamera** allows us to embed sensor data as QRcode into each image frame which is input from a camera module on your computer, and export a SenbayVideo.
 
-#### On CLI
+#### CLI
 Download SenbayKit-CLI from GitHub and move to the directory. You can execute SenbayCamera by the following command.
  ```command
- ./sample_camera.py
+ ./sample_camera.py -o sample.m4v
  ```
 
 Options to change video size, frame rate, and output path are as following.
@@ -112,36 +112,51 @@ Options to change video size, frame rate, and output path are as following.
  | ---- | ---- |
  | -w --width        | 640 |
  | -h --height       | 360 |
- | -o --video-output | 'senbay_video_output.m4v' |
+ | -o --video-output | None |
  | -i --camera-input | 0  |
- | -f --fps          | 30 |
- | -t --threads      | 10 |
+ | -r --fps          | 30 |
+ | -s --stdout       | False |
 
 
-#### In Python
-For using the package in Python, You need to import `SenbayCamera` module from `senbay` package. You can handle "QRcode generation" and "completion" events by through callback methods which are set by you when executing `start` method.
+#### Python
+For using the package in Python, You need to import `SenbayCamera` module from `senbay` package. You can handle "QRcode generation" and "completion" events by through callback methods which are set by you when initializing a `SenbayCamera` instance.
 In the "QRcode generation" method, you need to return a String object as a content of a QRcode. Inside SenbayCamera, a QRcode based on the returned String object is generated and embedded into a video frame automatically.
 
 ```python
 from senbay import SenbayCamera
 
-def get_content():
-  return "Return a String object as a content of QRcode"
+def content():
+  return "TIME:1234,ACCX:123"
 
 def complete():
   print("done")
 
-camera = SenbayCamera()
-camera.start(get_content,complete)
+camera = SenbayCamera(video_output="sample.m4v",
+                      content=content,
+                      completion=complete)
+camera.start()
+```
+
+#### Live Streaming
+Using `senbay` package with `ffmpeg` and `ffplay` allows us to stream the recorded video in the real-time via [Real-time Transport Protocol (RTP)](https://tools.ietf.org/html/rfc3550). Please check [sample_stream.sh](./sample_stream.sh) for more details. This method is applicable to other protocol such as [Real Time Messaging Protocol (RTMP)](https://www.adobe.com/devnet/rtmp.html) which is supported on YouTube Live.
+
+```shell
+## Sender Command
+./sample_camera.py --without-preview --stdout -w 640 -h 360 | \
+ffmpeg \
+	-f rawvideo -pixel_format bgr24 -video_size 640x360 -i - \
+	-c:v libx264 -pix_fmt yuv420p -r 30 -g 60 -b:v 2500k \
+	-f rtp rtp://localhost:8080 -sdp_file stream.sdp
+
+## Receiver Command
+ffplay -protocol_whitelist "file,udp,rtp" stream.sdp
 ```
 
 #### TODO
- - [x] Support multi-thread
  - [x] Set SenbayCamera configurations by options
- - [ ] Support Queue
- - [ ] Use GPU
- - [ ] Modify UI
  - [ ] Test on other platforms (Raspberry Pi, Windows, and Ubuntu)
+ - [x] RTP Live Streaming with `ffmpeg`
+ - [ ] RTMP Liver Streaming (YouTube Live) with `ffmpeg`
 
 ### SenbayFormat
 Generate a SenbayFormat data.

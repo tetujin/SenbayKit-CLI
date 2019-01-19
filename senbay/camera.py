@@ -11,49 +11,18 @@ import sys
 import numpy as np
 import cv2
 import time
-import threading
 import qrcode
 from PIL import Image
 from datetime import datetime
 
-class ActivePool(object):
-    video_output = None;
-    pre_time = 0;
-    def __init__(self, video_output):
-        super(ActivePool, self).__init__()
-        self.active = []
-        self.lock = threading.Lock()
-        self.video_output = video_output;
-
-    def lockAndWriteFrame(self, frame, name, now):
-        with self.lock:
-            if self.pre_time < now:
-                # self.active.append(name)
-                self.video_output.write(frame)
-                # print('Running: %s', self.active)
-                self.pre_time = now
-                # cv2.imshow('frame',frame)
-#            else:
-#                print('Skipping: %s', self.active);
-    #def unLock(self, name):
-        #with self.lock:
-        #    print('Unlock');
-            # self.active.remove(name)
-
-
-class SenbayThread(threading.Thread):
-    video_output = None;
+class SenbayFrame:
     w = 640;
     h = 360;
     frame = None;
     data = None;
     qr_maker = None;
-    pool = None;
 
-    def __init__(self, video_output, w, h, frame, data, pool):
-        super(SenbayThread, self).__init__()
-        self.pool = pool;
-        self.video_output = video_output;
+    def __init__(self, w, h, frame, data):
         self.w = w;
         self.h = h;
         self.frame = frame;
@@ -64,30 +33,24 @@ class SenbayThread(threading.Thread):
                 border=1
                 )
 
-    def run(self):
+    def gen(self):
         self.qr_maker.add_data(self.data)
         self.qr_maker.make(fit=True)
         qrimg = self.qr_maker.make_image()
         self.qr_maker.clear()
 
         pil_image = qrimg.convert('RGB')
-        img2 = np.array(pil_image)
-        img2 = img2[:, :, ::-1].copy()
+        qr_layer = np.array(pil_image)
+        qr_layer = qr_layer[:, :, ::-1].copy()
 
         # Our operations on the frame come here
-        img1 = cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGBA)
+        base_layer = cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGBA)
 
         # Overlay an image (QR code) to a base image
-        img1 = self.overlayOnPart(img1, img2, 0, 0);
-
-        name = threading.currentThread().getName()
-        now = time.time()
-        self.pool.lockAndWriteFrame(img1,name,now);
-
-    # pool.unLock(name);
+        return self.overlay(base_layer, qr_layer, 0, 0)
 
     # PILを使って画像を合成
-    def overlayOnPart(self, src_image, overlay_image, posX, posY):
+    def overlay(self, src_image, overlay_image, pos_x, pos_y):
         # オーバレイ画像のサイズを取得
         ol_height, ol_width = overlay_image.shape[:2]
         # OpenCVの画像データをPILに変換
@@ -109,7 +72,7 @@ class SenbayThread(threading.Thread):
         # 同じ大きさの透過キャンパスを用意
         tmp = Image.new('RGBA', src_image_PIL.size, (255, 255, 255, 0))
         # 用意したキャンパスに上書き
-        tmp.paste(overlay_image_PIL, (posX, posY), overlay_image_PIL)
+        tmp.paste(overlay_image_PIL, (pos_x, pos_y), overlay_image_PIL)
         # オリジナルとキャンパスを合成して保存
         result = Image.alpha_composite(src_image_PIL, tmp)
 
@@ -121,46 +84,54 @@ class SenbayCamera:
     width  = 640
     height = 360
     fps = 30 # fps
-    max_trehad = 10 # threading
     camera_number  = None
-    video_path = None
+    video_output = None
     video_out = None
-    pool = None
     debug = False
 
     ESC_KEY  = 27     # Escキー
     interval = 10     # 待ち時間
 
-    def __init__(self, camera_number=0, video_path='senbay_video_output.m4v', width=640, height=360, fps=30, max_trehad = 10, debug=False):
-        self.camera_number = camera_number;
-        self.video_path = video_path;
-        self.height = height;
-        self.width = width;
-        self.fps = fps;
-        self.max_trehad = max_trehad;
-        self.debug = debug;
+    preview = True
+    stdout = False
 
-    def start(self, delegate, completion, preview=True):
+    content = None
+    completion = None
+
+    def __init__(self, camera_number=0, video_output=None, width=640, height=360, fps=30, debug=False, preview=True, stdout=False, content=None, completion=None):
+        self.camera_number = camera_number
+        self.video_output =video_output
+        self.height = height
+        self.width = width
+        self.fps = fps
+        self.debug = debug
+        self.preview = preview
+        self.stdout = stdout
+        self.content = content
+        self.completion = completion
+
+    def start(self):
 
         camera_in = cv2.VideoCapture(self.camera_number)
 
         fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
-        video_out = cv2.VideoWriter(self.video_path, fourcc, self.fps,(self.width, self.height))
 
-        self.pool = ActivePool(video_out);
+        if self.video_output != None:
+            video_out = cv2.VideoWriter(self.video_output, fourcc, self.fps,(self.width, self.height))
 
         while(camera_in.isOpened()):
             '''
-            def delegatedMethod(self):
+            def content(self):
                 sd = SenbayData.SenbayData(121);
                 now = time.time()
                 sd.addNumber("TIME",now)
                 data = sd.getSenbayFormattedData(True);
                 return data;
             '''
-            content = delegate();
-            # if self.debug:
-            #     print("[SenbayCamera] content: " + content)
+            if self.content != None:
+                data = self.content()
+            else:
+                data = ""
 
             # Capture frame-by-frame
             ret, frame = camera_in.read()
@@ -168,14 +139,21 @@ class SenbayCamera:
             if ret==False:
                 break
 
-            if threading.active_count() < self.max_trehad:
-                senbay_th = SenbayThread(video_out,
-                                        self.width,
-                                        self.height,
-                                        frame,
-                                        content,
-                                        self.pool);
-                senbay_th.start()
+            # generate a Senbay Frame
+            sbframe = SenbayFrame(self.width, self.height, frame, data);
+            senbay_frame = sbframe.gen()
+
+            # preview
+            if self.preview == True:
+                cv2.imshow('frame', senbay_frame)
+
+            # video out put
+            if self.video_output != None:
+                video_out.write(senbay_frame)
+
+            # stdout
+            if self.stdout == True:
+                sys.stdout.buffer.write(senbay_frame.tobytes())
 
             key = cv2.waitKey(self.interval) & 0xFF
             if key is self.ESC_KEY:
@@ -184,11 +162,10 @@ class SenbayCamera:
             # if self.debug:
             #     print(threading.active_count())
 
-            if preview is True:
-                cv2.imshow('frame',frame)
-
         # When everything done, release the capture
         camera_in.release()
-        video_out.release()
+        if self.video_output != None:
+            video_out.release()
         cv2.destroyAllWindows()
-        completion()
+        if self.completion != None:
+            self.completion()

@@ -17,17 +17,18 @@ if __name__ == '__main__':
     '''
     -w --width        640
     -h --height       360
-    -o --video-output 'senbay_video_output.m4v'
+    -o --video-output None
     -i --camera-input 0
-    -f --fps          30
-    -t --threads      10
+    -r --fps          30
     '''
     width  = 640
     height = 360
     fps = 30 # fps
     threads = 10 # threading
     camera_input_number  = 0
-    video_output_path = 'senbay_video_output.m4v'
+    video_output_path = None
+    stdout = False
+    preview = True
 
     args = sys.argv
     for i in range(1, len(sys.argv)):
@@ -40,12 +41,14 @@ if __name__ == '__main__':
             video_output_path = args[i+1]
         if arg == "-i" or arg == "--camera-input":
             camera_input_number = int(args[i+1])
-        if arg == "-f" or arg == "--fps":
+        if arg == "-r" or arg == "--fps":
             fps = int(args[i+1])
-        if arg == "-t" or arg == "--threads":
-            threads = int(args[i+1])
+        if arg == "-s" or arg == "--stdout":
+            stdout = True
+        if arg == "--without-preview":
+            preview = False
 
-    def process():
+    def content():
         sd = SenbayData();
         now = time.time()
         sd.add_number("TIME",now)
@@ -57,11 +60,15 @@ if __name__ == '__main__':
 
     ### camera input
     camera = SenbayCamera(camera_number=camera_input_number,
-                          video_path=video_output_path,
+                          video_output=video_output_path,
                           width=width,
                           height=height,
                           fps=fps,
-                          max_trehad = threads)
-    camera.start(process, completion, preview=True)
+                          content=content,
+                          completion=completion,
+                          stdout=stdout,
+                          preview=preview)
+
+    camera.start()
 
     print('You can quit this application by ESC button on the preview window.')
