@@ -138,7 +138,9 @@ camera.start()
 ```
 
 #### Live Streaming
-Using `senbay` package with `ffmpeg` and `ffplay` allows us to stream the recorded video in the real-time via [Real-time Transport Protocol (RTP)](https://tools.ietf.org/html/rfc3550). Please check [sample_stream.sh](./sample_stream.sh) for more details. This method is applicable to other protocol such as [Real Time Messaging Protocol (RTMP)](https://www.adobe.com/devnet/rtmp.html) which is supported on YouTube Live.
+[ffmpeg](https://www.ffmpeg.org/about.html) is a powerful tool for handling multimedia files. Using `ffmpeg` with `senbay` package, you can stream Senbay Video in the real-time via [Real-time Transport Protocol (RTP)](https://tools.ietf.org/html/rfc3550). Please check [sample_stream.sh](./sample_stream.sh) for more details. `--stdout` option provides a raw video frame to standard output. You can forward and use it on the other programs. 
+
+The following commands show an example for streaming Senbay Video via RTP using ffmpeg.
 
 ```shell
 ## Sender Command
