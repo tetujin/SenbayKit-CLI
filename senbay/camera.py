@@ -55,10 +55,7 @@ class SenbayFrame:
         ol_height, ol_width = overlay_image.shape[:2]
         # OpenCVの画像データをPILに変換
         #　BGRAからRGBAへ変換
-        src_image_RGBA = src_image # cv2.cvtColor(src_image, cv2.COLOR_BGR2RGB)
-        #src_image_RGBA = cv2.cvtColor(src_image,0)
-        #overlay_image_RGBA = cv2.cvtColor(overlay_image, cv2.COLOR_BGRA2RGBA)
-        #overlay_image_RGBA = cv2.cvtColor(overlay_image,0)
+        src_image_RGBA = src_image
         overlay_image_RGBA = overlay_image
 
         #　PILに変換
@@ -95,10 +92,11 @@ class SenbayCamera:
     preview = True
     stdout = False
 
-    content = None
-    completion = None
+    content_handler = None
+    completion_handler = None
+    frame_handler = None
 
-    def __init__(self, camera_number=0, video_output=None, width=640, height=360, fps=30, debug=False, preview=True, stdout=False, content=None, completion=None):
+    def __init__(self, camera_number=0, video_output=None, width=640, height=360, fps=30, debug=False, preview=True, stdout=False, content_handler=None, completion_handler=None, frame_handler=None):
         self.camera_number = camera_number
         self.video_output =video_output
         self.height = height
@@ -107,37 +105,45 @@ class SenbayCamera:
         self.debug = debug
         self.preview = preview
         self.stdout = stdout
-        self.content = content
-        self.completion = completion
+        self.content_handler = content_handler
+        self.completion_handler = completion_handler
+        self.frame_handler = frame_handler
 
     def start(self):
 
         camera_in = cv2.VideoCapture(self.camera_number)
 
+        # http://www.fourcc.org/codecs.php
         fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
+        # fourcc = cv2.VideoWriter_fourcc(*'XVID') ##  XVID: XVID MPEG-4
 
         if self.video_output != None:
             video_out = cv2.VideoWriter(self.video_output, fourcc, self.fps,(self.width, self.height))
 
         while(camera_in.isOpened()):
             '''
-            def content(self):
+            def content_handler(self):
                 sd = SenbayData.SenbayData(121);
                 now = time.time()
                 sd.addNumber("TIME",now)
                 data = sd.getSenbayFormattedData(True);
                 return data;
             '''
-            if self.content != None:
-                data = self.content()
+            if self.content_handler != None:
+                data = self.content_handler()
             else:
                 data = ""
 
             # Capture frame-by-frame
             ret, frame = camera_in.read()
-            frame = cv2.resize( frame, (self.width, self.height))
+            frame = cv2.resize(frame, (self.width, self.height))
+            frame = cv2.flip(frame,1)
             if ret==False:
                 break
+
+            # handling frame
+            if self.frame_handler != None:
+                frame = self.frame_handler(frame)
 
             # generate a Senbay Frame
             sbframe = SenbayFrame(self.width, self.height, frame, data);
@@ -159,13 +165,10 @@ class SenbayCamera:
             if key is self.ESC_KEY:
                 break
 
-            # if self.debug:
-            #     print(threading.active_count())
-
         # When everything done, release the capture
         camera_in.release()
         if self.video_output != None:
             video_out.release()
         cv2.destroyAllWindows()
-        if self.completion != None:
-            self.completion()
+        if self.completion_handler != None:
+            self.completion_handler()

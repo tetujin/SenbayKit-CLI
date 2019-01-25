@@ -8,6 +8,7 @@ Created on Sat Jan 12 06:17:17 2019
 
 import sys
 import time
+import cv2
 
 from senbay import SenbayCamera
 from senbay import SenbayData
@@ -21,14 +22,19 @@ if __name__ == '__main__':
     -i --camera-input 0
     -r --fps          30
     '''
-    width  = 640
-    height = 360
-    fps = 30 # fps
+    width   = 640
+    height  = 360
+    fps     = 30 # fps
     threads = 10 # threading
-    camera_input_number  = 0
-    video_output_path = None
-    stdout = False
+    camera_input_number = 0
+    video_output_path   = None
+    stdout  = False
     preview = True
+    face    = False
+    cascade = None
+    cascade_path = "./cascade/haarcascade_frontalface_alt.xml"
+
+    face_exist_status = 0
 
     args = sys.argv
     for i in range(1, len(sys.argv)):
@@ -47,16 +53,38 @@ if __name__ == '__main__':
             stdout = True
         if arg == "--without-preview":
             preview = False
+        if arg == "-f" or arg == "--frace":
+            cascade = cv2.CascadeClassifier(cascade_path)
+            face = True
 
-    def content():
+    def content_handler():
         sd = SenbayData();
         now = time.time()
         sd.add_number("TIME",now)
+        if face is True:
+            sd.add_number("FACE",face_exist_status)
         data = sd.encode();
         return data;
 
-    def completion():
-        print("done")
+    def completion_handler():
+        print("done");
+
+    def frame_handler(frame):
+        if face == True:
+            facerect = cascade.detectMultiScale(frame, scaleFactor=1.1, minNeighbors=1, minSize=(1, 1))
+            print(facerect)
+            color = (255, 255, 255)
+            for rect in facerect:
+                # croped =  frame[rect[1]:rect[1]+rect[3],rect[0]:rect[0]+rect[2]]
+                # cv2.imwrite(str(time.time())+".jpg", croped)
+                cv2.rectangle(frame, tuple(rect[0:2]),tuple(rect[0:2]+rect[2:4]), color, thickness=2)
+
+            if len(facerect) > 0:
+                face_exist_status = 1
+            else:
+                face_exist_status = 0
+
+        return frame;
 
     ### camera input
     camera = SenbayCamera(camera_number=camera_input_number,
@@ -64,8 +92,9 @@ if __name__ == '__main__':
                           width=width,
                           height=height,
                           fps=fps,
-                          content=content,
-                          completion=completion,
+                          content_handler=content_handler,
+                          completion_handler=completion_handler,
+                          frame_handler=frame_handler,
                           stdout=stdout,
                           preview=preview)
 

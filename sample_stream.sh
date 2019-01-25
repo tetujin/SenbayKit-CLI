@@ -19,12 +19,14 @@
 # 	--without-preview --stdout -r 30 -w 1280 -h 720 | \
 # ffmpeg \
 # 	-f rawvideo -pix_fmt bgr24 -r 30 -s 1280x720 -i - \
-# 	-c:v libx264 -pix_fmt yuv420p -r 30 -g 60 -b:v 3000k \
-# 	-f flv -s 1280x720 rtmp://a.rtmp.youtube.com/live2/zgzx-kwhh-44pp-e7ps
-
+# 	-c:v libx264 -preset veryfast -maxrate 1984k -bufsize 3968k \
+#   -vf "format=yuv420p" -g 60 \
+# 	-f flv rtmp://a.rtmp.youtube.com/live2/dcfv-xfz4-5v1m-9ybx
+### https://trac.ffmpeg.org/wiki/Encode/YouTube
+### https://stackoverflow.com/questions/43586435/ffmpeg-to-youtube-live
 
 ### Sample 3: Show an exported video frame using ffplay
-# ./sample_camera.py \
+# ./sample_camera.py -o test.mp4 \
 # 	--without-preview --stdout -w 640 -h 360 | \
 # ffplay \
 # 	-f rawvideo -pix_fmt bgr24 -s 640x360 -i -
