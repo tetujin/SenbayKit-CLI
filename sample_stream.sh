@@ -1,6 +1,6 @@
 ### Samepl 1: RTP (local)
 ## Sender Command
-# ./sample_camera.py \
+# python ./sample_camera.py \
 # 	--without-preview \
 # 	--stdout \
 # 	-w 640 \
@@ -16,14 +16,15 @@
 
 ### Sample 2 : RTMP (YouTube Live) ()
 # ./sample_camera.py \
-# 	--without-preview --stdout -r 30 -w 1280 -h 720 | \
+# 	--stdout -r 30 -w 1280 -h 720 | \
 # ffmpeg \
 # 	-f rawvideo -pix_fmt bgr24 -r 30 -s 1280x720 -i - \
 # 	-c:v libx264 -preset veryfast -maxrate 1984k -bufsize 3968k \
 #   -vf "format=yuv420p" -g 60 \
-# 	-f flv rtmp://a.rtmp.youtube.com/live2/dcfv-xfz4-5v1m-9ybx
-### https://trac.ffmpeg.org/wiki/Encode/YouTube
-### https://stackoverflow.com/questions/43586435/ffmpeg-to-youtube-live
+# 	-f flv rtmp://a.rtmp.youtube.com/live2/xxxxxxxxx
+
+## https://trac.ffmpeg.org/wiki/Encode/YouTube
+## https://stackoverflow.com/questions/43586435/ffmpeg-to-youtube-live
 
 ### Sample 3: Show an exported video frame using ffplay
 # ./sample_camera.py -o test.mp4 \

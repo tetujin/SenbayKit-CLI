@@ -3,14 +3,14 @@ import setuptools
 
 setuptools.setup(
     name='SenbayKit',
-    version='0.1.0',
+    version='0.1.1',
     description='SenbayKit for Python',
     long_description='',
     author='Yuuki Nishiyama',
     author_email='yuuki.nishiyama@oulu.fi',
     url='https://github.com/tetujin/SenbayKit-CLI',
     license='Apache License 2.0',
-    install_requires=['numpy','opencv-python','fastzbarlight','qrcode','mss'],
+    install_requires=['numpy','opencv-python','fastzbarlight','qrcode','mss','six'],
     packages=[
         'senbay'
     ],

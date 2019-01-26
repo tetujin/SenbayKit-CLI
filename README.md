@@ -6,12 +6,13 @@
 </p>
 
 ## Environment
-This package is constructed on Python3, and depend on following external packages:
+This package is constructed on Python, and depend on following external packages:
  * NumPy
- * OpenCV 3
+ * OpenCV
  * fastzbarlight
  * qrcode
  * mss
+ * six
 
 This package is developed on macOS 10.12(Sierra), but you can use it on Windows and UNIX-based Operating Systems.
 
@@ -93,9 +94,9 @@ reader.start(showResult)
 
 #### TODO
  - [x] Set SenbayReader configurations by options
- - [ ] Use GPU
- - [ ] Polish UI of the sample applications
- - [ ] Test on other platforms (Raspberry Pi, Windows, and Ubuntu)
+ - [x] Test on Raspberry Pi
+ - [ ] Test on Windows
+ - [ ] Test on Ubuntu
 
 ### SenbayCamera
 **SenbaCamera** allows us to embed sensor data as QRcode into each image frame which is input from a camera module on your computer, and export a SenbayVideo.
@@ -119,26 +120,31 @@ Options to change video size, frame rate, and output path are as following.
 
 
 #### Python
-For using the package in Python, You need to import `SenbayCamera` module from `senbay` package. You can handle "QRcode generation" and "completion" events by through callback methods which are set by you when initializing a `SenbayCamera` instance.
-In the "QRcode generation" method, you need to return a String object as a content of a QRcode. Inside SenbayCamera, a QRcode based on the returned String object is generated and embedded into a video frame automatically.
+For using the package in Python, You need to import `SenbayCamera` module from `senbay` package. You can handle "QRcode generation," "frame generation," and "capture completion" events by through callback methods which are set when initializing a `SenbayCamera` instance.
+Using `content_handler`, you can insert QRcode content into each video frame. In the method, you need to return a String object as a content of a QRcode. Inside SenbayCamera, a QRcode is generated based on the returned String object, and embedded into a video frame automatically. If you have interested in to use video frames, you can handle each video frame by `frame_handler`. The handler is called when SenbayCamera get a new video frame.
 
 ```python
 from senbay import SenbayCamera
 
-def content():
+def content_handler():
   return "TIME:1234,ACCX:123"
 
-def complete():
+def completion_handler():
   print("done")
 
+def frame_handler(frame):
+  # do something to the frame
+  return frame
+
 camera = SenbayCamera(video_output="sample.m4v",
-                      content=content,
-                      completion=complete)
+                      content_handler=content_handler,
+                      completion_handler=completion_handler,
+                      frame_handler=frame_handler)
 camera.start()
 ```
 
 #### Live Streaming
-[ffmpeg](https://www.ffmpeg.org/about.html) is a powerful tool for handling multimedia files. Using `ffmpeg` with `senbay` package, you can stream Senbay Video in the real-time via [Real-time Transport Protocol (RTP)](https://tools.ietf.org/html/rfc3550). Please check [sample_stream.sh](./sample_stream.sh) for more details. `--stdout` option provides a raw video frame to standard output. You can forward and use it on the other programs. 
+[ffmpeg](https://www.ffmpeg.org/about.html) is a powerful tool for handling multimedia files. Using `ffmpeg` with `senbay` package, you can stream Senbay Video in the real-time via [Real-time Transport Protocol (RTP)](https://tools.ietf.org/html/rfc3550). Please check [sample_stream.sh](./sample_stream.sh) for more details. `--stdout` option provides a raw video frame to standard output. You can forward and use it on the other programs.
 
 The following commands show an example for streaming Senbay Video via RTP using ffmpeg.
 
@@ -155,10 +161,12 @@ ffplay -protocol_whitelist "file,udp,rtp" stream.sdp
 ```
 
 #### TODO
- - [x] Set SenbayCamera configurations by options
- - [ ] Test on other platforms (Raspberry Pi, Windows, and Ubuntu)
  - [x] RTP Live Streaming with `ffmpeg`
- - [ ] RTMP Liver Streaming (YouTube Live) with `ffmpeg`
+ - [x] Support Python2.x
+ - [x] Test on Raspberry Pi
+ - [ ] Test on Windows
+ - [ ] Test on Ubuntu
+ - [ ] Support RTMP Liver Streaming (YouTube Live) function
 
 ### SenbayFormat
 Generate a SenbayFormat data.
@@ -167,8 +175,8 @@ Generate a SenbayFormat data.
 from senbay import SenbayData
 
 sd = SenbayData()
-sd.add_number('key',value);
-sd.add_text('key','value');
+sd.add_number('KEY1',value1);
+sd.add_text('KEY2','value2');
 print(sd.encode());
 ```
 

@@ -26,6 +26,7 @@ if __name__ == '__main__':
     height  = 360
     fps     = 30 # fps
     threads = 10 # threading
+    fourcc  = 'mp4v'
     camera_input_number = 0
     video_output_path   = None
     stdout  = False
@@ -53,9 +54,11 @@ if __name__ == '__main__':
             stdout = True
         if arg == "--without-preview":
             preview = False
-        if arg == "-f" or arg == "--frace":
+        if arg == "-f" or arg == "--face":
             cascade = cv2.CascadeClassifier(cascade_path)
             face = True
+        if arg == "-c" or arg == "--video-codec":
+            fourcc = args[i+1]
 
     def content_handler():
         sd = SenbayData();
@@ -87,17 +90,18 @@ if __name__ == '__main__':
         return frame;
 
     ### camera input
-    camera = SenbayCamera(camera_number=camera_input_number,
-                          video_output=video_output_path,
-                          width=width,
-                          height=height,
-                          fps=fps,
-                          content_handler=content_handler,
-                          completion_handler=completion_handler,
-                          frame_handler=frame_handler,
-                          stdout=stdout,
-                          preview=preview)
-
-    camera.start()
+    camera = SenbayCamera(camera_number = camera_input_number,
+                          video_output  = video_output_path,
+                          width  = width,
+                          height = height,
+                          fps    = fps,
+                          content_handler    = content_handler,
+                          completion_handler = completion_handler,
+                          frame_handler      = frame_handler,
+                          stdout = stdout,
+                          preview= preview,
+                          fourcc = fourcc)
 
     print('You can quit this application by ESC button on the preview window.')
+
+    camera.start()

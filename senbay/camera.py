@@ -12,6 +12,7 @@ import numpy as np
 import cv2
 import time
 import qrcode
+import six
 from PIL import Image
 from datetime import datetime
 
@@ -92,11 +93,13 @@ class SenbayCamera:
     preview = True
     stdout = False
 
+    fourcc = 'mp4v'
+
     content_handler = None
     completion_handler = None
     frame_handler = None
 
-    def __init__(self, camera_number=0, video_output=None, width=640, height=360, fps=30, debug=False, preview=True, stdout=False, content_handler=None, completion_handler=None, frame_handler=None):
+    def __init__(self, camera_number=0, video_output=None, width=640, height=360, fps=30, debug=False, fourcc='mp4v', preview=True, stdout=False, content_handler=None, completion_handler=None, frame_handler=None):
         self.camera_number = camera_number
         self.video_output =video_output
         self.height = height
@@ -108,14 +111,14 @@ class SenbayCamera:
         self.content_handler = content_handler
         self.completion_handler = completion_handler
         self.frame_handler = frame_handler
+        self.fourcc = fourcc
 
     def start(self):
 
         camera_in = cv2.VideoCapture(self.camera_number)
 
         # http://www.fourcc.org/codecs.php
-        fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
-        # fourcc = cv2.VideoWriter_fourcc(*'XVID') ##  XVID: XVID MPEG-4
+        fourcc = cv2.VideoWriter_fourcc(*self.fourcc)
 
         if self.video_output != None:
             video_out = cv2.VideoWriter(self.video_output, fourcc, self.fps,(self.width, self.height))
@@ -159,7 +162,10 @@ class SenbayCamera:
 
             # stdout
             if self.stdout == True:
-                sys.stdout.buffer.write(senbay_frame.tobytes())
+                if six.PY2:
+                    sys.stdout.write( senbay_frame.tostring() )
+                else:
+                    sys.stdout.buffer.write( senbay_frame.tobytes() )
 
             key = cv2.waitKey(self.interval) & 0xFF
             if key is self.ESC_KEY:
