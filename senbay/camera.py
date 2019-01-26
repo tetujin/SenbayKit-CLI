@@ -98,8 +98,9 @@ class SenbayCamera:
     content_handler = None
     completion_handler = None
     frame_handler = None
+    senbay_frame_handler = None
 
-    def __init__(self, camera_number=0, video_output=None, width=640, height=360, fps=30, debug=False, fourcc='mp4v', preview=True, stdout=False, content_handler=None, completion_handler=None, frame_handler=None):
+    def __init__(self, camera_number=0, video_output=None, width=640, height=360, fps=30, debug=False, fourcc='mp4v', preview=True, stdout=False, content_handler=None, completion_handler=None, frame_handler=None, senbay_frame_handler=None):
         self.camera_number = camera_number
         self.video_output =video_output
         self.height = height
@@ -111,6 +112,7 @@ class SenbayCamera:
         self.content_handler = content_handler
         self.completion_handler = completion_handler
         self.frame_handler = frame_handler
+        self.senbay_frame_handler = senbay_frame_handler
         self.fourcc = fourcc
 
     def start(self):
@@ -159,6 +161,9 @@ class SenbayCamera:
             # video out put
             if self.video_output != None:
                 video_out.write(senbay_frame)
+
+            if self.senbay_frame_handler != None:
+                self.senbay_frame_handler(senbay_frame)
 
             # stdout
             if self.stdout == True:

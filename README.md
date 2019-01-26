@@ -119,8 +119,30 @@ Options to change video size, frame rate, and output path are as following.
  | -s --stdout       | False |
 
 
+#### Live Streaming
+[ffmpeg](https://www.ffmpeg.org/about.html) is a powerful tool for handling multimedia files. Using `ffmpeg` with `senbay` package, you can stream Senbay Video in the real-time via [Real-time Transport Protocol (RTP)](https://tools.ietf.org/html/rfc3550). Please check [sample_stream.sh](./sample_stream.sh) for more details. `--stdout` option provides a raw video frame to standard output. You can forward and use it on the other programs.
+
+The following commands show an example for streaming Senbay Video via RTP using ffmpeg.
+
+```shell
+## Sender Command
+./sample_camera.py \
+	--without-preview \
+	--stdout \
+	-w 640 \
+	-h 360 | \
+ffmpeg \
+	-f rawvideo -pixel_format bgr24 -video_size 640x360 -i - \
+	-c:v libx264 \
+	-f rtp rtp://localhost:8080 -sdp_file stream.sdp
+
+## Receiver Command
+ffplay -protocol_whitelist "file,udp,rtp" stream.sdp
+```
+
 #### Python
 For using the package in Python, You need to import `SenbayCamera` module from `senbay` package. You can handle "QRcode generation," "frame generation," and "capture completion" events by through callback methods which are set when initializing a `SenbayCamera` instance.
+
 Using `content_handler`, you can insert QRcode content into each video frame. In the method, you need to return a String object as a content of a QRcode. Inside SenbayCamera, a QRcode is generated based on the returned String object, and embedded into a video frame automatically. If you have interested in to use video frames, you can handle each video frame by `frame_handler`. The handler is called when SenbayCamera get a new video frame.
 
 ```python
@@ -136,28 +158,11 @@ def frame_handler(frame):
   # do something to the frame
   return frame
 
-camera = SenbayCamera(video_output="sample.m4v",
-                      content_handler=content_handler,
-                      completion_handler=completion_handler,
-                      frame_handler=frame_handler)
+camera = SenbayCamera(video_output    = "sample.m4v",
+                      content_handler = content_handler,
+                      completion_handler = completion_handler,
+                      frame_handler   = frame_handler)
 camera.start()
-```
-
-#### Live Streaming
-[ffmpeg](https://www.ffmpeg.org/about.html) is a powerful tool for handling multimedia files. Using `ffmpeg` with `senbay` package, you can stream Senbay Video in the real-time via [Real-time Transport Protocol (RTP)](https://tools.ietf.org/html/rfc3550). Please check [sample_stream.sh](./sample_stream.sh) for more details. `--stdout` option provides a raw video frame to standard output. You can forward and use it on the other programs.
-
-The following commands show an example for streaming Senbay Video via RTP using ffmpeg.
-
-```shell
-## Sender Command
-./sample_camera.py --without-preview --stdout -w 640 -h 360 | \
-ffmpeg \
-	-f rawvideo -pixel_format bgr24 -video_size 640x360 -i - \
-	-c:v libx264 -pix_fmt yuv420p -r 30 -g 60 -b:v 2500k \
-	-f rtp rtp://localhost:8080 -sdp_file stream.sdp
-
-## Receiver Command
-ffplay -protocol_whitelist "file,udp,rtp" stream.sdp
 ```
 
 #### TODO

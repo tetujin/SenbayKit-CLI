@@ -1,18 +1,17 @@
 ### Samepl 1: RTP (local)
 ## Sender Command
-# python ./sample_camera.py \
+# ./sample_camera.py \
 # 	--without-preview \
 # 	--stdout \
 # 	-w 640 \
 # 	-h 360 | \
 # ffmpeg \
 # 	-f rawvideo -pixel_format bgr24 -video_size 640x360 -i - \
-# 	-c:v libx264 -pix_fmt yuv420p -r 10 -g 60 -b:v 2500k \
+# 	-c:v libx264 \
 # 	-f rtp rtp://localhost:8080 -sdp_file stream.sdp
 #
 ## Recevier Command
 # ffplay -protocol_whitelist "file,udp,rtp" stream.sdp
-
 
 ### Sample 2 : RTMP (YouTube Live) ()
 # ./sample_camera.py \
