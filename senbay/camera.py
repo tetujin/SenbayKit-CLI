@@ -23,7 +23,7 @@ class SenbayFrame:
     data = None;
     qr_maker = None;
 
-    def __init__(self, w=640, h=360, frame=None, data=None, qr_box_size=10, qr_border=1, qr_error_correction = qrcode.constants.ERROR_CORRECT_L):
+    def __init__(self, w=640, h=360, frame=None, data=None, qr_box_size=5, qr_border=1, qr_error_correction = qrcode.constants.ERROR_CORRECT_L):
         self.w = w;
         self.h = h;
         self.frame = frame;
