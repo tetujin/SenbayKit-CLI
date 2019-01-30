@@ -165,20 +165,21 @@ camera = SenbayCamera(video_output    = "sample.m4v",
 camera.start()
 ```
 
-#### Live Streaming with Web Server (Flask)
-[Flask](http://flask.pocoo.org/) is a micro-framework for Python based on Werkzeug, Jinja 2 and good intentions. Just few lines of codes, you can stream Senbay Video frames via web-browser.
+#### Live Streaming by MotionJPEG + Web Server (Flask)
 
-For using Flask, you need to install it.
+[Motion JPEG(M-JPEG or MJPEG)](https://en.wikipedia.org/wiki/Motion_JPEG) is a video compression format based on JPEG which is one of an image compression formula.  A Motion JPEG video is composed by multiple JPEG images, and the each frame is used as a video frame.
+
+[Flask](http://flask.pocoo.org/) is a micro-framework for Python based on Werkzeug, Jinja 2 and good intentions. Just few lines of codes, you can stream Senbay Video using MotionJPEG.
+
+For using Flask, you need to install Flask package.
 ```shell
 pip install flask
 ```
 
-[app.py](./server/) in the server directory is the sample app.
-You just execute following command on your terminal to stream Senbay Video frames. By the default setting, you can access the frame on http://localhost:5000.
+[app.py](./server/) is a sample server based on Flask. You just execute the following command on your terminal to stream Senbay Video frames. By the default setting, you can access the frame on http://localhost:5000.
 ```shell
 flask run
 ```
-
 
 #### TODO
  - [x] RTP Live Streaming with `ffmpeg`
