@@ -23,81 +23,107 @@ class SenbayFrame:
     data = None;
     qr_maker = None;
 
-    def __init__(self, w, h, frame, data):
+    def __init__(self, w=640, h=360, frame=None, data=None, qr_box_size=10, qr_border=1, qr_error_correction = qrcode.constants.ERROR_CORRECT_L):
         self.w = w;
         self.h = h;
         self.frame = frame;
         self.data = data;
         self.qr_maker = qrcode.QRCode(
-                error_correction=qrcode.constants.ERROR_CORRECT_L,
-                box_size=3,
-                border=1
+                error_correction=qr_error_correction,
+                box_size=qr_box_size,
+                border=qr_border
                 )
 
     def gen(self):
+        '''Generate a Senbay Frame based on the input video frame and data.
+
+        Returns
+        --------------
+        senbay_frame : img
+            An image of Senbay Frame.
+        '''
+        # Generate a QR code image
         self.qr_maker.add_data(self.data)
         self.qr_maker.make(fit=True)
         qrimg = self.qr_maker.make_image()
         self.qr_maker.clear()
 
+        # Generate a QR code layer
         pil_image = qrimg.convert('RGB')
         qr_layer = np.array(pil_image)
         qr_layer = qr_layer[:, :, ::-1].copy()
 
-        # Our operations on the frame come here
+        # Generate a base layer
         base_layer = cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGBA)
 
-        # Overlay an image (QR code) to a base image
+        # Put the QR code layer on the base layer
         return self.overlay(base_layer, qr_layer, 0, 0)
 
-    # PILを使って画像を合成
-    def overlay(self, src_image, overlay_image, pos_x, pos_y):
-        # オーバレイ画像のサイズを取得
+
+    def overlay(self, base_image, overlay_image, pos_x, pos_y):
+        '''Compose two images using PIL.
+
+        Parameters
+        ----------
+        base_image : img
+            A base image.
+        overlay_image : img
+            A overlay image.
+        pos_x : int
+            A position (X-axis) of overlay image.
+        pos_y : int
+            A position (Y-axis) of overlay image.
+
+        Returns
+        ----------
+        composed_image : img
+            A composed image based on the parameters.
+        '''
+        # Get a size of the overlay image
         ol_height, ol_width = overlay_image.shape[:2]
-        # OpenCVの画像データをPILに変換
-        #　BGRAからRGBAへ変換
-        src_image_RGBA = src_image
+
+        base_image_RGBA = base_image
         overlay_image_RGBA = overlay_image
 
-        #　PILに変換
-        src_image_PIL=Image.fromarray(src_image_RGBA)
+        # Convert PIL from OpenCV image
+        base_image_PIL=Image.fromarray(base_image_RGBA)
         overlay_image_PIL=Image.fromarray(overlay_image_RGBA)
 
-        # 合成のため、RGBAモードに変更
-        src_image_PIL = src_image_PIL.convert('RGBA')
+        # Convert RGBA for composing
+        base_image_PIL = base_image_PIL.convert('RGBA')
         overlay_image_PIL = overlay_image_PIL.convert('RGBA')
 
-        # 同じ大きさの透過キャンパスを用意
-        tmp = Image.new('RGBA', src_image_PIL.size, (255, 255, 255, 0))
-        # 用意したキャンパスに上書き
+        # Generate a transparent image (the same size of the base image)
+        tmp = Image.new('RGBA', base_image_PIL.size, (255, 255, 255, 0))
+        # Put on the overlya image on the transparent image
         tmp.paste(overlay_image_PIL, (pos_x, pos_y), overlay_image_PIL)
-        # オリジナルとキャンパスを合成して保存
-        result = Image.alpha_composite(src_image_PIL, tmp)
 
-        # COLOR_RGBA2BGRA から COLOR_RGBA2BGRに変更。アルファチャンネルを含んでいるとうまく動画に出力されない。
+        # Compose the base image and the transparent + overlay image
+        result = Image.alpha_composite(base_image_PIL, tmp)
+
+        # Convert COLOR_RGBA2BGRA to COLOR_RGBA2BGR for removing the alpha channel on the generated image. The alpha channel makes error for exporting a video file
         return  cv2.cvtColor(np.asarray(result), cv2.COLOR_RGBA2BGR)
-        #return  cv2.cvtColor(np.asarray(result), 0)
 
 class SenbayCamera:
     width  = 640
     height = 360
-    fps = 30 # fps
-    camera_number  = None
-    video_output = None
-    video_out = None
-    debug = False
+    fps    = 30
+    camera_number = None
+    video_output  = None
+    video_out     = None
+    debug         = False
 
-    ESC_KEY  = 27     # Escキー
-    interval = 10     # 待ち時間
+    ESC_KEY  = 27
+    interval = 10
 
-    preview = True
-    stdout = False
+    preview  = True
+    stdout   = False
 
-    fourcc = 'mp4v'
+    fourcc   = 'mp4v'
 
-    content_handler = None
-    completion_handler = None
-    frame_handler = None
+    content_handler      = None
+    completion_handler   = None
+    frame_handler        = None
     senbay_frame_handler = None
 
     def __init__(self, camera_number=0, video_output=None, width=640, height=360, fps=30, debug=False, fourcc='mp4v', preview=True, stdout=False, content_handler=None, completion_handler=None, frame_handler=None, senbay_frame_handler=None):
@@ -116,6 +142,8 @@ class SenbayCamera:
         self.fourcc = fourcc
 
     def start(self):
+        '''Start SenbayCamera.
+        '''
 
         camera_in = cv2.VideoCapture(self.camera_number)
 

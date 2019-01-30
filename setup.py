@@ -3,7 +3,7 @@ import setuptools
 
 setuptools.setup(
     name='SenbayKit',
-    version='0.1.2',
+    version='0.1.3',
     description='SenbayKit for Python',
     long_description='',
     author='Yuuki Nishiyama',

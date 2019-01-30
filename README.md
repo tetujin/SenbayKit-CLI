@@ -119,7 +119,7 @@ Options to change video size, frame rate, and output path are as following.
  | -s --stdout       | False |
 
 
-#### Live Streaming
+#### Live Streaming with ffmpeg
 [ffmpeg](https://www.ffmpeg.org/about.html) is a powerful tool for handling multimedia files. Using `ffmpeg` with `senbay` package, you can stream Senbay Video in the real-time via [Real-time Transport Protocol (RTP)](https://tools.ietf.org/html/rfc3550). Please check [sample_stream.sh](./sample_stream.sh) for more details. `--stdout` option provides a raw video frame to standard output. You can forward and use it on the other programs.
 
 The following commands show an example for streaming Senbay Video via RTP using ffmpeg.
@@ -164,6 +164,21 @@ camera = SenbayCamera(video_output    = "sample.m4v",
                       frame_handler   = frame_handler)
 camera.start()
 ```
+
+#### Live Streaming with Web Server (Flask)
+[Flask](http://flask.pocoo.org/) is a micro-framework for Python based on Werkzeug, Jinja 2 and good intentions. Just few lines of codes, you can stream Senbay Video frames via web-browser.
+
+For using Flask, you need to install it.
+```shell
+pip install flask
+```
+
+[app.py](./server/) in the server directory is the sample app.
+You just execute following command on your terminal to stream Senbay Video frames. By the default setting, you can access the frame on http://localhost:5000.
+```shell
+flask run
+```
+
 
 #### TODO
  - [x] RTP Live Streaming with `ffmpeg`
