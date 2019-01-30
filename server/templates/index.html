@@ -1,9 +1,45 @@
 <html>
   <head>
     <title>Video Streaming Demonstration</title>
+    <!-- install 'jsqrcode' ( https://github.com/LazarSoft/jsqrcode )-->
+    <script type="text/javascript" src="/static/senbaykit/js/qrcode/grid.js"></script>
+    <script type="text/javascript" src="/static/senbaykit/js/qrcode/version.js"></script>
+    <script type="text/javascript" src="/static/senbaykit/js/qrcode/detector.js"></script>
+    <script type="text/javascript" src="/static/senbaykit/js/qrcode/formatinf.js"></script>
+    <script type="text/javascript" src="/static/senbaykit/js/qrcode/errorlevel.js"></script>
+    <script type="text/javascript" src="/static/senbaykit/js/qrcode/bitmat.js"></script>
+    <script type="text/javascript" src="/static/senbaykit/js/qrcode/datablock.js"></script>
+    <script type="text/javascript" src="/static/senbaykit/js/qrcode/bmparser.js"></script>
+    <script type="text/javascript" src="/static/senbaykit/js/qrcode/datamask.js"></script>
+    <script type="text/javascript" src="/static/senbaykit/js/qrcode/rsdecoder.js"></script>
+    <script type="text/javascript" src="/static/senbaykit/js/qrcode/gf256poly.js"></script>
+    <script type="text/javascript" src="/static/senbaykit/js/qrcode/gf256.js"></script>
+    <script type="text/javascript" src="/static/senbaykit/js/qrcode/decoder.js"></script>
+    <script type="text/javascript" src="/static/senbaykit/js/qrcode/qrcode.js"></script>
+    <script type="text/javascript" src="/static/senbaykit/js/qrcode/findpat.js"></script>
+    <script type="text/javascript" src="/static/senbaykit/js/qrcode/alignpat.js"></script>
+    <script type="text/javascript" src="/static/senbaykit/js/qrcode/databr.js"></script>
+
+     <!-- install 'senbay' -->
+    <script type="text/javascript" src="/static/senbaykit/js/senbay/BaseX.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/senbaykit/js/senbay/SenbayFormat.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/senbaykit/js/senbay/SenbayReader.js" charset="utf-8"></script>
   </head>
   <body>
     <h1>Video Streaming Demonstration</h1>
-    <img src="{{ url_for('video_feed') }}">
+    <image id="v" src="{{ url_for('video_feed') }}">
+    <canvas id="qr-canvas" hidden></canvas>
+
+    <p id="data"></p>
+
+    <script type="text/javascript">
+      var reader = new SenbayReader('v');
+      var interval = 100; // millisecond
+        reader.start(interval, function(json){
+          // console.log(json);
+          document.getElementById('data').innerHTML = "TIME: "+json["TIME"]
+      });
+  // reader.stop();
+    </script>
   </body>
 </html>

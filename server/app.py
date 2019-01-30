@@ -21,7 +21,7 @@ def gen():
     while True:
         # content:
         # YOUR CODE IS HERE
-        now = str(time.time())
+        now = "V:3,TIME:"+str(time.time())
 
         # frame
         rval, frame = vc.read()

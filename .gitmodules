@@ -1,0 +1,3 @@
+[submodule "server/static/SenbayKit-Browser"]
+	path = server/static/SenbayKit-Browser
+	url = https://github.com/tetujin/SenbayKit-Browser
