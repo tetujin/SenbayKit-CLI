@@ -6,9 +6,9 @@ from senbay import SenbayFrame
 
 app = Flask(__name__)
 vc = cv2.VideoCapture(0)
-# vc.set(cv2.CAP_PROP_FPS, 10)           # カメラFPSを60FPSに設定
-# vc.set(cv2.CAP_PROP_FRAME_WIDTH, 640) # カメラ画像の横幅を1280に設定
-# vc.set(cv2.CAP_PROP_FRAME_HEIGHT, 360) # カメラ画像の縦幅を720に設定
+# vc.set(cv2.CAP_PROP_FPS, 10)
+# vc.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+# vc.set(cv2.CAP_PROP_FRAME_HEIGHT, 360)
 
 @app.route('/')
 def index():
@@ -17,16 +17,18 @@ def index():
 
 def gen():
     """Video streaming generator function."""
+    sframe = SenbayFrame(qr_box_size = 5)
     while True:
-        # content
-        now = time.time()
+        # content:
+        # YOUR CODE IS HERE
+        now = str(time.time())
+
         # frame
         rval, frame = vc.read()
         frame = cv2.resize(frame, (640, 360))
-        frame = cv2.flip(frame,1)
-        height, width = frame.shape[:2]
-        sframe = SenbayFrame(width, height, frame, str(now), qr_box_size = 5)
-        imencoded = cv2.imencode(".jpg", sframe.gen())[1]
+        frame = cv2.flip(frame, 1)
+
+        imencoded = cv2.imencode(".jpg", sframe.gen(frame=frame,data=now))[1]
         yield (b'--frame\r\n'
            b'Content-Type: image/jpeg\r\n\r\n' + imencoded.tostring() + b'\r\n')
 

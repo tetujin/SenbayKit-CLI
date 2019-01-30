@@ -17,24 +17,35 @@ from PIL import Image
 from datetime import datetime
 
 class SenbayFrame:
-    w = 640;
-    h = 360;
-    frame = None;
-    data = None;
     qr_maker = None;
+    fill_color = 'black';
+    back_color = 'white';
 
-    def __init__(self, w=640, h=360, frame=None, data=None, qr_box_size=5, qr_border=1, qr_error_correction = qrcode.constants.ERROR_CORRECT_L):
-        self.w = w;
-        self.h = h;
-        self.frame = frame;
-        self.data = data;
+    '''
+    qr_box_size:
+        A pixel size of error correct box.
+        default value = 10
+
+    qr_border:
+        A border size of QR code.
+        default value = 5
+
+    qr_error_correction:
+        qrcode.constants.ERROR_CORRECT_L(7%)
+        qrcode.constants.ERROR_CORRECT_M(15%, default)
+        qrcode.constants.ERROR_CORRECT_Q(25%)
+        qrcode.constants.ERROR_CORRECT_H(30%)
+    '''
+    def __init__(self, qr_box_size=5, qr_border=1, qr_error_correction= qrcode.constants.ERROR_CORRECT_L, qr_fill_color='black', qr_back_color='white'):
         self.qr_maker = qrcode.QRCode(
                 error_correction=qr_error_correction,
                 box_size=qr_box_size,
                 border=qr_border
                 )
+        self.fill_color = qr_fill_color
+        self.back_color = qr_back_color
 
-    def gen(self):
+    def gen(self, frame=None, data=None):
         '''Generate a Senbay Frame based on the input video frame and data.
 
         Returns
@@ -43,9 +54,9 @@ class SenbayFrame:
             An image of Senbay Frame.
         '''
         # Generate a QR code image
-        self.qr_maker.add_data(self.data)
+        self.qr_maker.add_data(data)
         self.qr_maker.make(fit=True)
-        qrimg = self.qr_maker.make_image()
+        qrimg = self.qr_maker.make_image( fill_color=self.fill_color, back_color=self.back_color)
         self.qr_maker.clear()
 
         # Generate a QR code layer
@@ -54,7 +65,7 @@ class SenbayFrame:
         qr_layer = qr_layer[:, :, ::-1].copy()
 
         # Generate a base layer
-        base_layer = cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGBA)
+        base_layer = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
 
         # Put the QR code layer on the base layer
         return self.overlay(base_layer, qr_layer, 0, 0)
@@ -125,8 +136,9 @@ class SenbayCamera:
     completion_handler   = None
     frame_handler        = None
     senbay_frame_handler = None
+    senbay_frame_maker   = None
 
-    def __init__(self, camera_number=0, video_output=None, width=640, height=360, fps=30, debug=False, fourcc='mp4v', preview=True, stdout=False, content_handler=None, completion_handler=None, frame_handler=None, senbay_frame_handler=None):
+    def __init__(self, camera_number=0, video_output=None, width=640, height=360, fps=30, debug=False, fourcc='mp4v', preview=True, stdout=False, content_handler=None, completion_handler=None, frame_handler=None, senbay_frame_handler=None, senbay_frame_maker=None):
         self.camera_number = camera_number
         self.video_output =video_output
         self.height = height
@@ -140,6 +152,10 @@ class SenbayCamera:
         self.frame_handler = frame_handler
         self.senbay_frame_handler = senbay_frame_handler
         self.fourcc = fourcc
+        if senbay_frame_maker == None:
+            self.senbay_frame_maker = SenbayFrame();
+        else:
+            self.senbay_frame_maker = senbay_frame_maker
 
     def start(self):
         '''Start SenbayCamera.
@@ -152,6 +168,7 @@ class SenbayCamera:
 
         if self.video_output != None:
             video_out = cv2.VideoWriter(self.video_output, fourcc, self.fps,(self.width, self.height))
+
 
         while(camera_in.isOpened()):
             '''
@@ -179,8 +196,7 @@ class SenbayCamera:
                 frame = self.frame_handler(frame)
 
             # generate a Senbay Frame
-            sbframe = SenbayFrame(self.width, self.height, frame, data);
-            senbay_frame = sbframe.gen()
+            senbay_frame = self.senbay_frame_maker.gen(frame=frame, data=data)
 
             # preview
             if self.preview == True:
