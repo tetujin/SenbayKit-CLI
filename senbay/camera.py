@@ -36,7 +36,12 @@ class SenbayFrame:
         qrcode.constants.ERROR_CORRECT_Q(25%)
         qrcode.constants.ERROR_CORRECT_H(30%)
     '''
-    def __init__(self, qr_box_size=5, qr_border=1, qr_error_correction= qrcode.constants.ERROR_CORRECT_L, qr_fill_color='black', qr_back_color='white'):
+    def __init__(self,
+                 qr_box_size = 5,
+                 qr_border   = 1,
+                 qr_error_correction = qrcode.constants.ERROR_CORRECT_L,
+                 qr_fill_color = 'black',
+                 qr_back_color = 'white'):
         self.qr_maker = qrcode.QRCode(
                 error_correction=qr_error_correction,
                 box_size=qr_box_size,
@@ -138,7 +143,19 @@ class SenbayCamera:
     senbay_frame_handler = None
     senbay_frame_maker   = None
 
-    def __init__(self, camera_number=0, video_output=None, width=640, height=360, fps=30, debug=False, fourcc='mp4v', preview=True, stdout=False, content_handler=None, completion_handler=None, frame_handler=None, senbay_frame_handler=None, senbay_frame_maker=None):
+    def __init__(self,
+                 camera_number=0,
+                 video_output=None,
+                 width=640, height=360, fps=30,
+                 debug=False,
+                 fourcc='mp4v',
+                 preview=True,
+                 stdout=False,
+                 content_handler=None,
+                 completion_handler=None,
+                 frame_handler=None,
+                 senbay_frame_handler=None,
+                 senbay_frame_maker=None):
         self.camera_number = camera_number
         self.video_output =video_output
         self.height = height
