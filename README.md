@@ -10,6 +10,7 @@ This package is constructed on Python, and depend on following external packages
  * NumPy
  * OpenCV
  * fastzbarlight
+ * pyzbar
  * qrcode
  * mss
  * six
@@ -19,10 +20,17 @@ This package is developed on macOS 10.12(Sierra), but you can use it on Windows 
 ## Install
 
 ### Install dependance libraries
+If you are using `macOS`, you need to install `zbar` before installing `pyzbar` by `pip`.
+```command
+brew install zbar
+```
+
+You can install following dependences via `pip`.
 ```command
 pip install numpy
 pip install opencv-python
 pip install fastzbarlight
+pip install pyzbar
 pip install qrcode
 pip install mss
 ```
@@ -83,18 +91,17 @@ reader.start(showResult)
 # Screen Mode
 from senbay import SenbayReader
 
-cap_area = {'top':200, 'left':200, 'width':200, 'height':200}
-
 def showResult(self, data):
     print(data)
 
-reader = SenbayReader(mode='screen', cap_area=cap_area)
+reader = SenbayReader(mode='screen')
 reader.start(showResult)
 ```
 
 #### TODO
  - [x] Set SenbayReader configurations by options
  - [x] Test on Raspberry Pi
+ - [x] Automatic QR code detection
  - [ ] Test on Windows
  - [ ] Test on Ubuntu
 

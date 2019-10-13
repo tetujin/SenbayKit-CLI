@@ -13,8 +13,10 @@ import sys
 import numpy as np
 import cv2
 import fastzbarlight as zl
+from pyzbar.pyzbar import decode
 from PIL import Image
 from mss import mss
+import os
 
 # import core as sd
 from senbay import SenbayData
@@ -26,18 +28,24 @@ class SenbayReader:
     camera_input = 0
     preview_input = True
     mode = 0 # 0=video, 1=camera, 2=screen
-    cap_area = {'top': 160, 'left': 160, 'width': 200, 'height': 200}
-    sct = None;
+    cap_area = None #{'top': 160, 'left': 160, 'width': 200, 'height': 200}
+    sct  = None
+    monitor_num = 1
+    is_retina = False
+    rescan_limit = 100
+    rescan_count = 0
 
-    def __init__(self, mode=0, video_in=None, camera_in=0, cap_area=None, preview_in=True):
+
+    def __init__(self, mode=0, video_in=None, camera_in=0, cap_area=None, preview_in=True, is_retina=None):
         self.reader_mode    = mode
         self.video_input    = video_in
         self.camera_input   = camera_in
         self.preview_input  = preview_in
-        if cap_area != None:
-            self.cap_area =  cap_area
+        self.cap_area       =  cap_area
+        if is_retina == None and os.name == 'posix':
+            self.is_retina = True
 
-    def set_capture_are(self, top=0, left=0, width=200, height=200):
+    def set_capture_are(self, top=0, left=0, width=0, height=0):
         self.cap_area = {'top': top, 'left': left, 'width': width, 'height': height}
 
     def start(self, observer):
@@ -51,7 +59,7 @@ class SenbayReader:
             self.reader_mode = 2
             sct = mss()
         else:
-            print('error: The mode value should be take 0(=video), 1(=camera), or 2(=screen).')
+            print('error: The mode value should be taken 0(=video), 1(=camera), or 2(=screen).')
             return
 
 
@@ -85,18 +93,41 @@ class SenbayReader:
         elif self.reader_mode == 2:
             while True:
                 # capture screen
-                sct_img = sct.grab(self.cap_area)
+                # print(sct.monitors)
+                sct_img = None
+                if (self.cap_area == None):
+                    sct_img = sct.grab(sct.monitors[self.monitor_num])
+                    print(sct.monitors[self.monitor_num])
+                else:
+                    sct_img = sct.grab(self.cap_area)
 
-                # generate an image
+                ### generate an image
                 img = Image.frombytes("RGB", sct_img.size, sct_img.bgra, "raw", "BGRX")
                 if self.preview_input:
                     cv2.imshow('frame', np.array(img))
+
+                if (self.cap_area == None):
+                    data = decode(img)
+                    if len(data) > 0:
+                        qr_rect = data[0].rect
+                        if self.is_retina:
+                            self.set_capture_are(top=qr_rect.top/2, left=qr_rect.left/2, width=qr_rect.width/2, height=qr_rect.height/2)
+                        else:
+                            self.set_capture_are(top=qr_rect.top, left=qr_rect.left, width=qr_rect.width, height=qr_rect.height)
+                        continue
 
                 codes = zl.scan_codes('qrcode', img)
                 if codes != None and len(codes) > 0:
                     # print(codes[0].decode('utf-8'))
                     senbayDict = senbayData.decode(str(codes[0].decode('utf-8')))
-                    observer(self, senbayDict);
+                    observer(self, senbayDict)
+                    self.rescan_count = 0
+                else:
+                    self.rescan_count = self.rescan_count + 1
+                    if self.rescan_count > self.rescan_limit:
+                        self.cap_area = None
+                        self.rescan_count = 0
+                # print(self.rescan_count, self.cap_area)
 
                 if cv2.waitKey(25) & 0xFF == ord('q'):
                     cv2.destroyAllWindows()

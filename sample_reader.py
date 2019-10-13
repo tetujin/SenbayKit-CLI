@@ -12,10 +12,10 @@ from senbay import SenbayReader
 if __name__ == '__main__':
 
     if len(sys.argv[1:]) < 4:
-        print('-----------------------------')
-        print('[Error]   Please set a capture area as arguments')
-        print('[Example] $ ./sample_reader.py 100 100 200 200')
-        print('------------------------------')
+        def showResult(self, data):
+            print(data)
+        reader = SenbayReader(mode='screen')
+        reader.start(showResult)
     else:
         top    = sys.argv[1]
         left   = sys.argv[2]
@@ -31,3 +31,8 @@ if __name__ == '__main__':
 
         reader = SenbayReader(mode='screen', cap_area=cap_area)
         reader.start(showResult)
+
+# print('-----------------------------')
+# print('[Error]   Please set a capture area as arguments')
+# print('[Example] $ ./sample_reader.py 100 100 200 200')
+# print('------------------------------')

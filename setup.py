@@ -10,7 +10,7 @@ setuptools.setup(
     author_email='yuuki.nishiyama@oulu.fi',
     url='https://github.com/tetujin/SenbayKit-CLI',
     license='Apache License 2.0',
-    install_requires=['numpy','opencv-python','fastzbarlight','qrcode','mss','six'],
+    install_requires=['numpy','opencv-python','fastzbarlight','qrcode','mss','six','pyzbar'],
     packages=[
         'senbay'
     ],
