@@ -13,9 +13,16 @@ if __name__ == '__main__':
 
     if len(sys.argv[1:]) < 4:
         def showResult(self, data):
+            # d = data
             print(data)
         reader = SenbayReader(mode='screen')
+        #### FPS ###
+        # def monitor(self, fps):
+        #     print(fps)
+        # reader.set_fps_monitor(monitor)
+        ############
         reader.start(showResult)
+
     else:
         top    = sys.argv[1]
         left   = sys.argv[2]

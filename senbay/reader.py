@@ -17,9 +17,11 @@ from pyzbar.pyzbar import decode
 from PIL import Image
 from mss import mss
 import os
+from datetime import datetime
 
 # import core as sd
 from senbay import SenbayData
+
 
 class SenbayReader:
 
@@ -31,22 +33,28 @@ class SenbayReader:
     cap_area = None #{'top': 160, 'left': 160, 'width': 200, 'height': 200}
     sct  = None
     monitor_num = 1
-    is_retina = False
     rescan_limit = 100
     rescan_count = 0
 
+    # For measuring FPS
+    last_ts = 0
+    cur_ts  = 0
+    frames  = 0
+    fps     = None
+    fps_monitor = None
 
-    def __init__(self, mode=0, video_in=None, camera_in=0, cap_area=None, preview_in=True, is_retina=None):
+    def __init__(self, mode=0, video_in=None, camera_in=0, cap_area=None, preview_in=True):
         self.reader_mode    = mode
         self.video_input    = video_in
         self.camera_input   = camera_in
         self.preview_input  = preview_in
-        self.cap_area       =  cap_area
-        if is_retina == None and os.name == 'posix':
-            self.is_retina = True
+        self.cap_area       = cap_area
 
     def set_capture_are(self, top=0, left=0, width=0, height=0):
         self.cap_area = {'top': top, 'left': left, 'width': width, 'height': height}
+
+    def set_fps_monitor(self, monitor):
+        self.fps_monitor = monitor
 
     def start(self, observer):
         if self.reader_mode == 0 or self.reader_mode == 'video':
@@ -106,21 +114,41 @@ class SenbayReader:
                 if self.preview_input:
                     cv2.imshow('frame', np.array(img))
 
-                if (self.cap_area == None):
+
+                if self.cap_area == None:
                     data = decode(img)
                     if len(data) > 0:
                         qr_rect = data[0].rect
-                        if self.is_retina:
+
+                        self.set_capture_are(top=qr_rect.top, left=qr_rect.left, width=qr_rect.width, height=qr_rect.height)
+
+                        if zl.scan_codes('qrcode', img) == None:
                             self.set_capture_are(top=qr_rect.top/2, left=qr_rect.left/2, width=qr_rect.width/2, height=qr_rect.height/2)
+                            print("is retina")
                         else:
-                            self.set_capture_are(top=qr_rect.top, left=qr_rect.left, width=qr_rect.width, height=qr_rect.height)
-                        continue
+                            print("is not retina")
 
                 codes = zl.scan_codes('qrcode', img)
                 if codes != None and len(codes) > 0:
                     # print(codes[0].decode('utf-8'))
                     senbayDict = senbayData.decode(str(codes[0].decode('utf-8')))
                     observer(self, senbayDict)
+
+                    # FPS
+                    if self.cur_ts == 0:
+                        self.cur_ts  = datetime.now().timestamp()
+                        self.last_ts = self.cur_ts
+                    else:
+                        self.cur_ts = datetime.now().timestamp()
+                        self.frames = self.frames + 1
+                        # print(self.cur_ts - self.last_ts)
+                        if self.cur_ts - self.last_ts > 1:
+                            self.fps = self.frames
+                            if self.fps_monitor != None:
+                                self.fps_monitor(self, self.fps)
+                            self.frames = 0
+                            self.last_ts = self.cur_ts
+
                     self.rescan_count = 0
                 else:
                     self.rescan_count = self.rescan_count + 1
