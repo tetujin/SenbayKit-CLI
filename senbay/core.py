@@ -73,7 +73,7 @@ class BaseX:
         @param: Positional notation
         """
         if positionalNotation > len(self.TABLE) or positionalNotation < 2 :
-            print("shinsu must be 2-%ld", str(len(self.LABLE)));
+            print("shinsu must be 2-%ld", str(len(self.TABLE)));
         else:
             self.PN = positionalNotation;
         #    print("A positional notation is " + str(self.PN));
